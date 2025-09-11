@@ -1,0 +1,141 @@
+{
+  "idCliente": "88b8a478-eb34-4b78-8a80-3596e5170c37",
+  "idConfWorkflow": "4fa81bd6-1e57-4111-a7bf-899f51f7a356",
+  "idUsuario": "1c8411d2-65de-4d5b-b69b-8c2826399bc6",
+  "email": "jose.assis@carpal.com.br",
+  "observacao": "20.Assinatura de Aviso de Férias - Teste Arquivar",
+  "comentario": "Aviso Férias Goiânia Abril 2025",
+  "formulario": {
+    "idFormulario": "6d6e1306-45da-4c54-8e77-8481107d5b2f",
+    "camposFormulario": [
+      {
+        "idCampo": "343e29e6-0a6e-4f45-b289-15d09ec5d2a6",
+        "labelCampo": "Filial",
+        "valorCampo": "MATRIZ"
+      },
+      {
+        "idCampo": "c9f21d73-3a84-40c8-90a0-f250a475733b",
+        "labelCampo": "Matrícula",
+        "valorCampo": "50081"
+      },
+      {
+        "idCampo": "dfccbc60-0e5d-4cb6-88ca-96fbbec7a0df",
+        "labelCampo": "Nome",
+        "valorCampo": "FERNANDA NAYANNE BASTOS SOARES"
+      },
+      {
+        "idCampo": "4089241f-a0ff-418d-bbcd-ee15c0e64dc0",
+        "labelCampo": "E-mail corporativo",
+        "valorCampo": "fernanda.soares@carpal.com.br"
+      },
+      {
+        "idCampo": "2e7d2121-f03f-48ca-a52b-dd0341a334bb",
+        "labelCampo": "E-mail Pessoal",
+        "valorCampo": "fernandanayanne@hotmail.com"
+      }
+    ]
+  },
+  "documentos": [
+    {
+      "codigoCaixa": "",
+      "idArvoreOrganizacional": "d3918f17-2d59-4f57-80d0-ad30e8c4e28d",
+      "valoresCampos": [
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Filial",
+          "valorCampo": "MATRIZ"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Matrícula",
+          "valorCampo": "50081"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Nome",
+          "valorCampo": "FERNANDA NAYANNE BASTOS SOARES"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "CPF",
+          "valorCampo": "030.764.031-09"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Cargo",
+          "valorCampo": "COORDENADOR CONTABIL"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Departamento",
+          "valorCampo": "CORPORATIVO ADMINISTRACAO ESCRITORIO"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Data de Admissão",
+          "valorCampo": "11/06/2019"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Data de Demissao",
+          "valorCampo": ""
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "E-mail corporativo",
+          "valorCampo": "fernanda.soares@carpal.com.br"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "E-mail Pessoal",
+          "valorCampo": "fernandanayanne@hotmail.com"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Situação",
+          "valorCampo": "ATIVO"
+        },
+        {
+          "nomeLista": "FUNCIONARIOS V2",
+          "label": "Sexo",
+          "valorCampo": "F"
+        },
+        {
+          "nomeLista": "",
+          "label": "Data Inicial",
+          "valorCampo": "01/03/2025"
+        },
+	{
+          "nomeLista": "",
+          "label": "Data Final",
+          "valorCampo": "31/03/2025"
+	}
+      ],
+      "arquivos": [
+        {
+          "arquivo": "" ,
+          "extensao": "PDF",
+          "assinar": true,
+          "versao": "",
+          "nomeAmigavel": "Assinatura Aviso de Férias",
+          "compartilhado": true
+        }
+      ]
+    }
+  ],
+  "arquivos": [
+    {
+      "arquivo": "",
+      "extensao": "PDF",
+      "assinar": true,
+      "versao": "",
+      "nomeArquivo": "Assinatura Aviso de Férias"
+    }
+  ],
+  "selecionadoExternoVarios": [
+    ""
+  ],
+  "emailGrupoExterno": [
+    ""
+  ]
+}
