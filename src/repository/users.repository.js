@@ -1,6 +1,10 @@
+// ...existing code...
 const knex = require('../database');
 
 class UsersRepository {
+  async findByEmail(email) {
+    return knex('usuario').where({ email }).first();
+  }
 
   async findAll({ offset = 0, limit = 5 } = {}) {
     let query = knex('usuario').select('*');

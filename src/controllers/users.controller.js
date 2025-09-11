@@ -43,6 +43,11 @@ class UsersController {
   async create(req, res) {
     try {
       const validatedData = createUserSchema.parse(req.body);
+      // Verifica se o email já está cadastrado
+      const existingUser = await UsersRepository.findByEmail(validatedData.email);
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: 'Email já cadastrado.' });
+      }
       const saltRounds = 6;
       const hashedPassword = await bcrypt.hash(validatedData.senha, saltRounds);
       const userData = {
