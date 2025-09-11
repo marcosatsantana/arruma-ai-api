@@ -23,7 +23,7 @@ class SessionsController {
 
             const { secret, expiresIn } = authConfig.jwt;
             const token = sign({}, secret, {
-                subject: String(user.id),
+                subject: String(user.usuarioid),
                 expiresIn
             });
 

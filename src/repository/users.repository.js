@@ -28,16 +28,13 @@ class UsersRepository {
     if (tipo !== undefined) updateData.tipo = tipo;
     if (cargo !== undefined) updateData.cargo = cargo;
     if (senha !== undefined) updateData.senha = senha;
-    return knex('usuario').where({ id }).update(updateData).returning('*');
+    return knex('usuario').where({ usuarioid: id }).update(updateData).returning('*');
   }
 
   async create({ nome, email, senha, telefone, cpf, tipo, cargo }) {
     return knex('usuario').insert({ nome, email, senha, telefone, cpf, tipo, cargo }).returning('*');
   }
 
-  async delete(id) {
-    return knex('usuario').where({ id }).del();
-  }
 }
 
 module.exports = new UsersRepository(); 

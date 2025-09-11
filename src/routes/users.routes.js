@@ -132,8 +132,65 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *         description: Dados inválidos
  */
 usersRoutes.post("/", UsersController.create);
-usersRoutes.put("/:id", ensureAuthenticated, UsersController.update);
-usersRoutes.delete('/:id', (req, res) => UsersController.delete(req, res));
+/**
+ * @swagger
+ * /users/update:
+ *   put:
+ *     summary: Atualiza os dados do usuário autenticado
+ *     description: O usuário é identificado pelo token JWT (Bearer Token). É obrigatório enviar o Bearer Token no header Authorization. Não é necessário informar o id na URL.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               cpf:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *               cargo:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Usuário atualizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 usuarioid:
+ *                   type: integer
+ *                 nome:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 telefone:
+ *                   type: string
+ *                 cpf:
+ *                   type: string
+ *                 tipo:
+ *                   type: string
+ *                 cargo:
+ *                   type: string
+ *                 senha:
+ *                   type: string
+ *                   nullable: true
+ *       400:
+ *         description: Dados inválidos
+ */
+usersRoutes.put("/update", ensureAuthenticated, UsersController.update);
 
 
 module.exports = usersRoutes;

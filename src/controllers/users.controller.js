@@ -30,7 +30,8 @@ class UsersController {
   }
 
   async update(req, res) {
-    const { id } = req.params;
+    const { id } = req.user;
+    console.log(req.user)
     try {
       const validatedData = updateUserSchema.parse(req.body);
       const updated = await UsersRepository.update(id, validatedData);
@@ -43,7 +44,6 @@ class UsersController {
   async create(req, res) {
     try {
       const validatedData = createUserSchema.parse(req.body);
-      // Verifica se o email já está cadastrado
       const existingUser = await UsersRepository.findByEmail(validatedData.email);
       if (existingUser) {
         return res.status(400).json({ success: false, message: 'Email já cadastrado.' });
@@ -66,11 +66,6 @@ class UsersController {
     }
   }
 
-  async delete(req, res) {
-    const { id } = req.params;
-    await UsersRepository.delete(id);
-    return res.status(204).send();
-  }
 }
 
 module.exports = new UsersController(); 
