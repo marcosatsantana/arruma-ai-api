@@ -3,6 +3,7 @@ const { Router } = require('express')
 
 const ProblemController = require('../controllers/problem.controller');
 const ensureAuthenticated = require('../middlewares/ensure.authenticated');
+const ensureAdmin = require('../middlewares/ensure.admin');
 
 
 const problemRoutes = Router();
@@ -54,6 +55,100 @@ const problemRoutes = Router();
  *         description: Dados inválidos
  */
 problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
+/**
+ * @swagger
+ * /problems:
+ *   get:
+ *     summary: Lista todos os problemas do usuário autenticado
+ *     description: Requer autenticação via Bearer Token.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Página da listagem
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Quantidade de problemas por página
+ *     responses:
+ *       200:
+ *         description: Lista de problemas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       problemaid:
+ *                         type: integer
+ *                       descricao:
+ *                         type: string
+ *                       categoria:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       data:
+ *                         type: string
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: string
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ */
+problemRoutes.get("/", ensureAuthenticated, ProblemController.index);
+
+/**
+ * @swagger
+ * /problems/{id}/{status}:
+ *   put:
+ *     summary: Atualiza o status de um problema (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do problema
+ *         example: 16
+ *       - in: path
+ *         name: status
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Novo status do problema
+ *         example: 3
+ *     responses:
+ *       200:
+ *         description: Problema atualizado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       403:
+ *         description: Acesso restrito a administradores
+ */
+problemRoutes.put('/:id/:status', ensureAuthenticated, ensureAdmin, ProblemController.updateStatus);
+
+
 
 
 module.exports = problemRoutes;

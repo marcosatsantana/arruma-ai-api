@@ -2,8 +2,11 @@
 const knex = require('../database');
 
 class UsersRepository {
+  async findById(id) {
+    return knex('usuario').where({ usuarioid: id }).first();
+  }
   async findByEmail(email) {
-    return knex('usuario').where({ email }).first();
+    return await knex('usuario').where({ email }).first();
   }
 
   async findAll({ offset = 0, limit = 5 } = {}) {
@@ -28,11 +31,11 @@ class UsersRepository {
     if (tipo !== undefined) updateData.tipo = tipo;
     if (cargo !== undefined) updateData.cargo = cargo;
     if (senha !== undefined) updateData.senha = senha;
-    return knex('usuario').where({ usuarioid: id }).update(updateData).returning('*');
+    return await knex('usuario').where({ usuarioid: id }).update(updateData).returning('*');
   }
 
   async create({ nome, email, senha, telefone, cpf, tipo, cargo }) {
-    return knex('usuario').insert({ nome, email, senha, telefone, cpf, tipo, cargo }).returning('*');
+    return await knex('usuario').insert({ nome, email, senha, telefone, cpf, tipo, cargo }).returning('*');
   }
 
 }

@@ -4,13 +4,36 @@ const knex = require('../database');
 class ProblemRepository {
     async create(data) {
         const { descricao, usuarioid, categoriaid, localizacaoid } = data;
-        return knex('problema').insert({
+        const newProblem = await knex('problema').insert({
             descricao,
             usuarioid,
             categoriaid,
             localizacaoid,
             statusid: "1"
         }).returning("problemaid")
+
+        return newProblem[0].problemaid
+    }
+    async findAll({ offset = 0, limit = 5, id } = {}) {
+        let query = knex('problema')
+            .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
+            .innerJoin('status', 'problema.statusid', 'status.statusid')
+            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
+        // Para obter o total filtrado
+        const totalQuery = query.clone().clearSelect().count('* as count').first();
+        const totalResult = await totalQuery;
+        const total = totalResult.count;
+
+        // Paginação
+        const data = await query.orderBy('problema.problemaid', 'asc').where({ usuarioid: id }).offset(offset).limit(limit);
+        return { data, total };
+    }
+
+    async update(id, status) {
+        return await knex('problema').update({ statusid: status }).where({ problemaid: id })
+    }
+    async findById(id) {
+        return await knex('problema').where({ problemaid: id}).first()
     }
 }
 
