@@ -14,7 +14,7 @@ class ProblemRepository {
 
         return newProblem[0].problemaid
     }
-    async findAll({ offset = 0, limit = 5, id } = {}) {
+    async findByUserId({ offset = 0, limit = 5, id } = {}) {
         let query = knex('problema')
             .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
             .innerJoin('status', 'problema.statusid', 'status.statusid')
@@ -26,6 +26,20 @@ class ProblemRepository {
 
         // Paginação
         const data = await query.orderBy('problema.problemaid', 'asc').where({ usuarioid: id }).offset(offset).limit(limit);
+        return { data, total };
+    }
+    async findAll({ offset = 0, limit = 5 } = {}) {
+        let query = knex('problema')
+            .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
+            .innerJoin('status', 'problema.statusid', 'status.statusid')
+            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
+        // Para obter o total filtrado
+        const totalQuery = query.clone().clearSelect().count('* as count').first();
+        const totalResult = await totalQuery;
+        const total = totalResult.count;
+
+        // Paginação
+        const data = await query.orderBy('problema.problemaid', 'asc').offset(offset).limit(limit);
         return { data, total };
     }
 

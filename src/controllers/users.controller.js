@@ -31,7 +31,6 @@ class UsersController {
 
   async update(req, res) {
     const { id } = req.user;
-    console.log(req.user)
     try {
       const validatedData = updateUserSchema.parse(req.body);
       const updated = await UsersRepository.update(id, validatedData);

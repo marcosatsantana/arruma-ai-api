@@ -12,7 +12,7 @@ const problemRoutes = Router();
  * /problems:
  *   post:
  *     summary: Cria um novo problema
- *     description: Requer autenticação via Bearer Token.
+ *     description: Requer autenticação via Bearer Token e imagem deve ser enviada em um array de Base64.
  *     tags: [Problems]
  *     security:
  *       - bearerAuth: []
@@ -112,8 +112,67 @@ problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
  *                     totalPages:
  *                       type: integer
  */
-problemRoutes.get("/", ensureAuthenticated, ProblemController.index);
-
+problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
+/**
+ * @swagger
+ * /problems/all:
+ *   get:
+ *     summary: Lista todos os problemas (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *         description: Página da listagem
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *         description: Quantidade de problemas por página
+ *     responses:
+ *       200:
+ *         description: Lista de todos os problemas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       problemaid:
+ *                         type: integer
+ *                       descricao:
+ *                         type: string
+ *                       categoria:
+ *                         type: string
+ *                       status:
+ *                         type: string
+ *                       data:
+ *                         type: string
+ *                 pagination:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: string
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *       403:
+ *         description: Acesso restrito a administradores
+ */
+problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.findAll);
 /**
  * @swagger
  * /problems/{id}/{status}:
