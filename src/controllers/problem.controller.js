@@ -4,6 +4,7 @@ const imageRepository = require('../repository/images.repository');
 const { createProblemSchema } = require('../validators/problemSchemas');
 const { format } = require('date-fns');
 const AppError = require('../utils/AppError');
+const notificationRepository = require('../repository/notification.repository');
 
 class ProblemController {
   async create(req, res) {
@@ -23,7 +24,9 @@ class ProblemController {
       imagens.map(async (image) => {
         await imageRepository.create(image, problemaid)
       })
-
+      const message = "Problema aberto e aguardando análise."
+      
+      await notificationRepository.create(id, 1, message)
 
       return res.status(201).json({ problemaid: problemaid });
     } catch (error) {
@@ -92,12 +95,20 @@ class ProblemController {
     }
   }
   async updateStatus(req, res) {
+    const usuarioid = req.user.id
     const { id, status } = req.params;
     try {
       const existProblem = await ProblemRepository.findById(id)
       if (!existProblem) {
         throw new AppError('Problema não encontrado', 404)
       }
+      const statusMessages = {
+        1: "Problema aberto e aguardando análise.",
+        2: "Problema em andamento, equipe atuando.",
+        3: "Problema resolvido com sucesso!"
+      };
+      const message = statusMessages[status] || "Status atualizado.";
+      await notificationRepository.create(usuarioid, status, message)
       await ProblemRepository.update(id, status)
 
       res.status(200).send()
