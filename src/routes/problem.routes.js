@@ -31,6 +31,10 @@ const problemRoutes = Router();
  *                 type: string
  *               longitude:
  *                 type: string
+ *               rua:
+ *                 type: string
+ *               ponto_referencia:
+ *                 type: string
  *               imagens:
  *                 type: array
  *                 items:

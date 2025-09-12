@@ -5,6 +5,8 @@ const createProblemSchema = z.object({
   categoriaid: z.coerce.number().int(),
   latitude: z.string(),
   longitude: z.string(),
+  rua: z.string(),
+  ponto_referencia: z.string(),
   imagens: z.array(z.string()).optional()
 });
 

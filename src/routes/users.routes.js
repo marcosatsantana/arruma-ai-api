@@ -135,7 +135,7 @@ usersRoutes.post("/", UsersController.create);
 /**
  * @swagger
  * /users/update:
- *   put:
+ *   patch:
  *     summary: Atualiza os dados do usuário autenticado
  *     description: O usuário é identificado pelo token JWT (Bearer Token). É obrigatório enviar o Bearer Token no header Authorization. Não é necessário informar o id na URL.
  *     tags: [Users]
@@ -190,7 +190,7 @@ usersRoutes.post("/", UsersController.create);
  *       400:
  *         description: Dados inválidos
  */
-usersRoutes.put("/update", ensureAuthenticated, UsersController.update);
+usersRoutes.patch("/update", ensureAuthenticated, UsersController.update);
 
 /**
  * @swagger

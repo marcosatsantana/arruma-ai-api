@@ -10,13 +10,13 @@ class ProblemController {
     const { id } = req.user;
     try {
       const validatedData = createProblemSchema.parse(req.body);
-      const localizacaoid = await LocationRepository.create(validatedData.latitude, validatedData.longitude);
+      const localizacaoid = await LocationRepository.create(validatedData.latitude, validatedData.longitude, validatedData.rua, validatedData.ponto_referencia);
 
       const problemaid = await ProblemRepository.create({
         descricao: validatedData.descricao,
         usuarioid: id,
         categoriaid: validatedData.categoriaid,
-        localizacaoid: localizacaoid
+        localizacaoid: localizacaoid,
       });
 
       const imagens = Array.isArray(validatedData.imagens) ? validatedData.imagens : [];
