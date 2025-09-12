@@ -28,16 +28,17 @@ class SessionsController {
             });
 
             // Remove a senha antes de retornar
-            const { senha: _, ...userWithoutPassword } = user;
+            const { senha: _, cpf: __, ...userWithoutSensitive } = user;
 
             const response = {
-                user: userWithoutPassword,
+                user: userWithoutSensitive,
                 token
             };
 
             return res.json(response);
 
         } catch (error) {
+            console.log(error)
             throw new AppError("Email e/ou senha incorreta", 401);
         }
     }

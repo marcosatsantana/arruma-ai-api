@@ -1,8 +1,23 @@
+const usersRepository = require('../repository/users.repository');
 const UsersRepository = require('../repository/users.repository');
+const AppError = require('../utils/AppError');
 const { createUserSchema, updateUserSchema } = require('../validators/userSchemas');
 const bcrypt = require('bcryptjs');
 
 class UsersController {
+  async findById(req, res) {
+    const { id } = req.user;
+    try {
+      const user = await usersRepository.findById(id)
+      if (!user) {
+        throw new AppError(404, 'Usuario não encontrado')
+      }
+      const { senha: _, ...userWithoutPassword } = user;
+      return res.status(200).json({ success: true, user: userWithoutPassword })
+    } catch (error) {
+      return res.status(400).json({ success: false, message: error.errors || error.message });
+    }
+  }
   async index(req, res) {
     try {
       const { page = 1, limit = 10 } = req.query;

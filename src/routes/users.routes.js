@@ -192,5 +192,44 @@ usersRoutes.post("/", UsersController.create);
  */
 usersRoutes.put("/update", ensureAuthenticated, UsersController.update);
 
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Retorna os dados do usuário autenticado
+ *     description: Não precisa de parâmetros. O usuário é identificado pelo token JWT (Bearer Token).
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Dados do usuário autenticado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     usuarioid:
+ *                       type: integer
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefone:
+ *                       type: string
+ *                     cpf:
+ *                       type: string
+ *                     tipo:
+ *                       type: string
+ *                     cargo:
+ *                       type: string
+ */
+usersRoutes.get("/me", ensureAuthenticated, UsersController.findById);
+
 
 module.exports = usersRoutes;
