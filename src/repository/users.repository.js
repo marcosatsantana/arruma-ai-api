@@ -30,7 +30,6 @@ class UsersRepository {
     if (nome !== undefined) updateData.nome = nome;
     if (email !== undefined) updateData.email = email;
     if (telefone !== undefined) updateData.telefone = telefone;
-    if (cpf !== undefined) updateData.cpf = cpf;
     if (tipo !== undefined) updateData.tipo = tipo;
     if (cargo !== undefined) updateData.cargo = cargo;
     if (senha !== undefined) updateData.senha = senha;

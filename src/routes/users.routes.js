@@ -150,8 +150,6 @@ usersRoutes.post("/", UsersController.create);
  *                 type: string
  *               telefone:
  *                 type: string
- *               cpf:
- *                 type: string
  *               tipo:
  *                 type: string
  *               cargo:
@@ -171,8 +169,6 @@ usersRoutes.post("/", UsersController.create);
  *                 email:
  *                   type: string
  *                 telefone:
- *                   type: string
- *                 cpf:
  *                   type: string
  *                 tipo:
  *                   type: string

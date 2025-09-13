@@ -1,3 +1,4 @@
+const { ZodError } = require('zod');
 const usersRepository = require('../repository/users.repository');
 const UsersRepository = require('../repository/users.repository');
 const AppError = require('../utils/AppError');
@@ -48,10 +49,31 @@ class UsersController {
     const { id } = req.user;
     try {
       const validatedData = updateUserSchema.parse(req.body);
+      if (validatedData.email) {
+        const userWithEmail = await UsersRepository.findByEmail(validatedData.email);
+        // Se existe outro usuário com esse email e não é o próprio usuário
+        if (userWithEmail && userWithEmail.usuarioid !== id) {
+          return res.status(400).json({
+            success: false,
+            message: 'Email já cadastrado por outro usuário.'
+          });
+        }
+      }
       const updated = await UsersRepository.update(id, validatedData);
       return res.json(updated);
     } catch (error) {
-      return res.status(400).json({ success: false, message: error.errors || error.message });
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: error.issues[0].message
+        });
+      }
+
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Ocorreu um erro inesperado no servidor.'
+      });
     }
   }
 
@@ -60,7 +82,7 @@ class UsersController {
       const validatedData = createUserSchema.parse(req.body);
       const existingUser = await UsersRepository.findByEmailOrCpf(validatedData.email, validatedData.cpf);
       if (existingUser) {
-        return res.status(400).json({ success: false, message: 'Email já cadastrado.' });
+        return res.status(400).json({ success: false, message: 'Email ou CPF já cadastrado.' });
       }
       const saltRounds = 6;
       const hashedPassword = await bcrypt.hash(validatedData.senha, saltRounds);
@@ -76,7 +98,18 @@ class UsersController {
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);
     } catch (error) {
-      return res.status(400).json({ success: false, message: error.errors || error.message });
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: error.issues[0].message
+        });
+      }
+
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Ocorreu um erro inesperado no servidor.'
+      });
     }
   }
 
