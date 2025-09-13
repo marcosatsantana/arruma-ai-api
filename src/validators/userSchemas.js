@@ -6,7 +6,6 @@ const createUserSchema = z.object({
   senha: z.string().min(6),
   telefone: z.string().min(10).max(15),
   cpf: z.string().length(11),
-  tipo: z.string().min(1),
 });
 
 const updateUserSchema = z.object({

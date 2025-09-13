@@ -70,7 +70,7 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: validatedData.tipo,
+        tipo: "usuario",
         cargo: "cidadao"
       };
       const created = await UsersRepository.create(userData);

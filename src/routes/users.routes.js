@@ -94,15 +94,12 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *                 type: string
  *               cpf:
  *                 type: string
- *               tipo:
- *                 type: string
  *             required:
  *               - nome
  *               - email
  *               - senha
  *               - telefone
  *               - cpf
- *               - tipo
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso
