@@ -58,7 +58,7 @@ class UsersController {
   async create(req, res) {
     try {
       const validatedData = createUserSchema.parse(req.body);
-      const existingUser = await UsersRepository.findByEmail(validatedData.email);
+      const existingUser = await UsersRepository.findByEmailOrCpf(validatedData.email, validatedData.cpf);
       if (existingUser) {
         return res.status(400).json({ success: false, message: 'Email já cadastrado.' });
       }

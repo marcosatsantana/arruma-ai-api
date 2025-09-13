@@ -8,6 +8,9 @@ class UsersRepository {
   async findByEmail(email) {
     return await knex('usuario').where({ email }).first();
   }
+  async findByEmailOrCpf(email, cpf) {
+    return await knex('usuario').where({ email }).orWhere({cpf}).first();
+  }
 
   async findAll({ offset = 0, limit = 5 } = {}) {
     let query = knex('usuario').select('*');
