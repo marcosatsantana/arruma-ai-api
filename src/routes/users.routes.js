@@ -96,8 +96,6 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *                 type: string
  *               tipo:
  *                 type: string
- *               cargo:
- *                 type: string
  *             required:
  *               - nome
  *               - email
@@ -105,7 +103,6 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *               - telefone
  *               - cpf
  *               - tipo
- *               - cargo
  *     responses:
  *       201:
  *         description: Usuário criado com sucesso

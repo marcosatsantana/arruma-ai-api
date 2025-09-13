@@ -71,7 +71,7 @@ class UsersController {
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
         tipo: validatedData.tipo,
-        cargo: validatedData.cargo
+        cargo: "cidadao"
       };
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);
