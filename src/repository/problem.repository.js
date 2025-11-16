@@ -16,9 +16,23 @@ class ProblemRepository {
     }
     async findByUserId({ offset = 0, limit = 5, id } = {}) {
         let query = knex('problema')
-            .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
+            .select(
+                'problema.*',
+                'status.nome as status',
+                'categoria.nome as categoria',
+                knex.raw('json_agg(imagem.dados) as imagens'),
+                'localizacao.*'
+            )
             .innerJoin('status', 'problema.statusid', 'status.statusid')
-            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
+            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid')
+            .innerJoin('imagem', 'imagem.problemaid', 'problema.problemaid')
+            .innerJoin('localizacao', 'localizacao.localizacaoid', 'problema.localizacaoid')
+            .groupBy(
+                'problema.problemaid',
+                'status.nome',
+                'categoria.nome',
+                'localizacao.localizacaoid'
+            );
         // Para obter o total filtrado
         const totalQuery = query.clone().clearSelect().count('* as count').where({ usuarioid: id }).first();
         const totalResult = await totalQuery;
@@ -47,7 +61,7 @@ class ProblemRepository {
         return await knex('problema').update({ statusid: status }).where({ problemaid: id })
     }
     async findById(id) {
-        return await knex('problema').where({ problemaid: id}).first()
+        return await knex('problema').where({ problemaid: id }).first()
     }
 }
 

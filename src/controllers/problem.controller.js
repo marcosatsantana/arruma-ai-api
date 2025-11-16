@@ -43,12 +43,20 @@ class ProblemController {
 
       const { data, total } = await ProblemRepository.findByUserId({ offset, limit: limitInt, id });
       const totalPages = Math.ceil(total / limitInt);
+      console.log(data)
       const formattedProblems = data.map(problem => ({
         problemaid: problem.problemaid,
         descricao: problem.descricao,
         categoria: problem.categoria,
         status: problem.status,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
+        imagem: problem.imagens,
+        endereco: {
+          latitude: problem.latitude,
+          longitude: problem.longitude,
+          rua: problem.rua,
+          ponto_referencia: problem.ponto_referencia,
+        }
       }));
       return res.json({
         success: true,

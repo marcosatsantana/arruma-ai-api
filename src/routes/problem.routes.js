@@ -104,6 +104,21 @@ problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
  *                         type: string
  *                       data:
  *                         type: string
+ *                       imagem:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       endereco:
+ *                         type: object
+ *                         properties:
+ *                           latitude:
+ *                             type: string
+ *                           longitude:
+ *                             type: string
+ *                           rua:
+ *                             type: string
+ *                           ponto_referencia:
+ *                             type: string
  *                 pagination:
  *                   type: object
  *                   properties:
@@ -162,6 +177,21 @@ problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
  *                         type: string
  *                       data:
  *                         type: string
+ *                       imagem:
+ *                         type: array
+ *                         items:
+ *                           type: string
+ *                       endereco:
+ *                         type: object
+ *                         properties:
+ *                           latitude:
+ *                             type: string
+ *                           longitude:
+ *                             type: string
+ *                           rua:
+ *                             type: string
+ *                           ponto_referencia:
+ *                             type: string
  *                 pagination:
  *                   type: object
  *                   properties:
