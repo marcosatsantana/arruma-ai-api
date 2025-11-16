@@ -9,7 +9,7 @@ const ensureAdmin = require('../middlewares/ensure.admin');
 const problemRoutes = Router();
 /**
  * @swagger
- * /problems:
+ * /problem:
  *   post:
  *     summary: Cria um novo problema
  *     description: Requer autenticação via Bearer Token e imagem deve ser enviada em um array de Base64.
@@ -61,7 +61,7 @@ const problemRoutes = Router();
 problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
 /**
  * @swagger
- * /problems:
+ * /problem:
  *   get:
  *     summary: Lista todos os problemas do usuário autenticado
  *     description: Requer autenticação via Bearer Token.
@@ -119,7 +119,7 @@ problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
 problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
 /**
  * @swagger
- * /problems/all:
+ * /problem/all:
  *   get:
  *     summary: Lista todos os problemas (apenas administradores)
  *     description: Requer autenticação via Bearer Token e permissão de administrador.
@@ -179,7 +179,7 @@ problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
 problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.findAll);
 /**
  * @swagger
- * /problems/{id}/{status}:
+ * /problem/{id}/{status}:
  *   put:
  *     summary: Atualiza o status de um problema (apenas administradores)
  *     description: Requer autenticação via Bearer Token e permissão de administrador.

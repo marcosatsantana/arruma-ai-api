@@ -20,7 +20,7 @@ class ProblemRepository {
             .innerJoin('status', 'problema.statusid', 'status.statusid')
             .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
         // Para obter o total filtrado
-        const totalQuery = query.clone().clearSelect().count('* as count').first();
+        const totalQuery = query.clone().clearSelect().count('* as count').where({ usuarioid: id }).first();
         const totalResult = await totalQuery;
         const total = totalResult.count;
 
