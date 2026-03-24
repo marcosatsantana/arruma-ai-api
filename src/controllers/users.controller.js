@@ -92,8 +92,8 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: "usuario",
-        cargo: "cidadao"
+        tipo: "cidadao",
+        cargo: "usuario"
       };
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);

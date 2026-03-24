@@ -42,6 +42,43 @@ class SessionsController {
             throw new AppError("Email e/ou senha incorreta", 401);
         }
     }
+    async loginAdmin(req, res) {
+        const { email, senha } = req.body;
+        const user = await UsersRepository.findByEmail(email);
+
+        if (!user) {
+            throw new AppError("Email e/ou senha incorreta", 401);
+        }
+
+        try {
+            const passwordMatched = await compare(senha, user.senha);
+            const isAdmin = user.tipo === 'admin';
+
+            if (!passwordMatched || !isAdmin) {
+                throw new AppError("Credenciais inválidas", 401);
+            }
+
+            const { secret, expiresIn } = authConfig.jwt;
+            const token = sign({}, secret, {
+                subject: String(user.usuarioid),
+                expiresIn
+            });
+
+            // Remove a senha antes de retornar
+            const { senha: _, cpf: __, ...userWithoutSensitive } = user;
+
+            const response = {
+                user: userWithoutSensitive,
+                token
+            };
+
+            return res.json(response);
+
+        } catch (error) {
+            console.log(error)
+            throw new AppError("Email e/ou senha incorreta", 401);
+        }
+    }
 }
 
 module.exports = SessionsController;

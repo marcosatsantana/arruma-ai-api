@@ -1,4 +1,4 @@
-const {Router} = require('express')
+const { Router } = require('express')
 
 
 const SessionsController = require("../controllers/sessions.controller");
@@ -57,6 +57,57 @@ const sessionsRoutes = Router();
  *         description: Credenciais inválidas
  */
 sessionsRoutes.post("/", sessionsController.create);
+/**
+ * @swagger
+ * /sessions/admin:
+ *   post:
+ *     summary: Realiza login do administrador
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *             required:
+ *               - email
+ *               - senha
+ *     responses:
+ *       200:
+ *         description: Login realizado com sucesso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 usuario:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     nome:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     telefone:
+ *                       type: string
+ *                     cpf:
+ *                       type: string
+ *                     tipo:
+ *                       type: string
+ *                     cargo:
+ *                       type: string
+ *       401:
+ *         description: Credenciais inválidas
+ */
+sessionsRoutes.post("/admin", sessionsController.loginAdmin);
 
 
 module.exports = sessionsRoutes;
