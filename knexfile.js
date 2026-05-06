@@ -6,27 +6,12 @@ module.exports = {
     client: 'pg',
     connection: {
       connectionString: process.env.POSTGRESQL_URL,
-      // Disable SSL for local development
-      ssl: true,
-    },
-    pool: {
-      // afterCreate property removed
-    },
-    migrations: {
-      directory: path.resolve(__dirname, 'src', 'database', 'migrations')
-    }
-  },
-
-  production: {
-    client: 'pg',
-    connection: {
-      connectionString: process.env.POSTGRESQL_URL,
-      // Keep SSL for cloud/production databases
-      ssl: { rejectUnauthorized: false },
+      family: 4, // Forces the connection to use IPv4
+      ssl: { rejectUnauthorized: false }
     },
     pool: {},
     migrations: {
       directory: path.resolve(__dirname, 'src', 'database', 'migrations')
     }
-  }
+  },
 };
