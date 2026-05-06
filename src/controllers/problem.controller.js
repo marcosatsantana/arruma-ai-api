@@ -35,13 +35,13 @@ class ProblemController {
   }
   async findByUserId(req, res) {
     const { id } = req.user;
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, bairro, categoria, status, data_criacao, prioridade } = req.query;
     const pageInt = parseInt(page, 10);
     const limitInt = parseInt(limit, 10);
     const offset = (pageInt - 1) * limitInt;
     try {
-
-      const { data, total } = await ProblemRepository.findByUserId({ offset, limit: limitInt, id });
+      const filters = { bairro, categoria, status, data_criacao, prioridade };
+      const { data, total } = await ProblemRepository.findByUserId({ offset, limit: limitInt, id, filters });
       const totalPages = Math.ceil(total / limitInt);
       console.log(data)
       const formattedProblems = data.map(problem => ({
@@ -73,13 +73,13 @@ class ProblemController {
     }
   }
   async findAll(req, res) {
-    const { page = 1, limit = 10 } = req.query;
+    const { page = 1, limit = 10, bairro, categoria, status, data_criacao, prioridade } = req.query;
     const pageInt = parseInt(page, 10);
     const limitInt = parseInt(limit, 10);
     const offset = (pageInt - 1) * limitInt;
     try {
-
-      const { data, total } = await ProblemRepository.findAll({ offset, limit: limitInt });
+      const filters = { bairro, categoria, status, data_criacao, prioridade };
+      const { data, total } = await ProblemRepository.findAll({ offset, limit: limitInt, filters });
       const totalPages = Math.ceil(total / limitInt);
       const formattedProblems = data.map(problem => ({
         problemaid: problem.problemaid,

@@ -14,7 +14,7 @@ class ProblemRepository {
 
         return newProblem[0].problemaid
     }
-    async findByUserId({ offset = 0, limit = 5, id } = {}) {
+    async findByUserId({ offset = 0, limit = 5, id, filters } = {}) {
         let query = knex('problema')
             .select(
                 'problema.*',
@@ -27,30 +27,49 @@ class ProblemRepository {
             .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid')
             .innerJoin('imagem', 'imagem.problemaid', 'problema.problemaid')
             .innerJoin('localizacao', 'localizacao.localizacaoid', 'problema.localizacaoid')
+            .where('problema.usuarioid', id)
             .groupBy(
                 'problema.problemaid',
                 'status.nome',
                 'categoria.nome',
                 'localizacao.localizacaoid'
             );
+
+        if (filters) {
+            if (filters.bairro) query.where('problema.bairro', 'ilike', `%${filters.bairro}%`);
+            if (filters.categoria) query.where('problema.categoriaid', filters.categoria);
+            if (filters.status) query.where('problema.statusid', filters.status);
+            if (filters.prioridade) query.where('problema.prioridadeID', filters.prioridade);
+            if (filters.data_criacao) query.whereRaw('DATE(problema.data_criacao) = ?', [filters.data_criacao]);
+        }
+
         // Para obter o total filtrado
-        const totalQuery = query.clone().clearSelect().count('* as count').where({ usuarioid: id }).first();
+        const totalQuery = query.clone().clearSelect().count('* as count').first();
         const totalResult = await totalQuery;
-        const total = totalResult.count;
+        const total = totalResult ? totalResult.count : 0;
 
         // Paginação
-        const data = await query.orderBy('problema.problemaid', 'asc').where({ usuarioid: id }).offset(offset).limit(limit);
+        const data = await query.orderBy('problema.problemaid', 'asc').offset(offset).limit(limit);
         return { data, total };
     }
-    async findAll({ offset = 0, limit = 5 } = {}) {
+    async findAll({ offset = 0, limit = 5, filters } = {}) {
         let query = knex('problema')
             .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
             .innerJoin('status', 'problema.statusid', 'status.statusid')
             .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
+
+        if (filters) {
+            if (filters.bairro) query.where('problema.bairro', 'ilike', `%${filters.bairro}%`);
+            if (filters.categoria) query.where('problema.categoriaid', filters.categoria);
+            if (filters.status) query.where('problema.statusid', filters.status);
+            if (filters.prioridade) query.where('problema.prioridadeID', filters.prioridade);
+            if (filters.data_criacao) query.whereRaw('DATE(problema.data_criacao) = ?', [filters.data_criacao]);
+        }
+
         // Para obter o total filtrado
         const totalQuery = query.clone().clearSelect().count('* as count').first();
         const totalResult = await totalQuery;
-        const total = totalResult.count;
+        const total = totalResult ? totalResult.count : 0;
 
         // Paginação
         const data = await query.orderBy('problema.problemaid', 'asc').offset(offset).limit(limit);

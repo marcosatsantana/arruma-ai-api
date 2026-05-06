@@ -79,6 +79,32 @@ problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
  *         schema:
  *           type: integer
  *         description: Quantidade de problemas por página
+ *       - in: query
+ *         name: bairro
+ *         schema:
+ *           type: string
+ *         description: Filtrar por bairro
+ *       - in: query
+ *         name: categoria
+ *         schema:
+ *           type: integer
+ *         description: ID da categoria para filtrar
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: integer
+ *         description: ID do status para filtrar
+ *       - in: query
+ *         name: data_criacao
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filtrar por data de criação (YYYY-MM-DD)
+ *       - in: query
+ *         name: prioridade
+ *         schema:
+ *           type: integer
+ *         description: ID da prioridade para filtrar
  *     responses:
  *       200:
  *         description: Lista de problemas
@@ -152,6 +178,32 @@ problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
  *         schema:
  *           type: integer
  *         description: Quantidade de problemas por página
+ *       - in: query
+ *         name: bairro
+ *         schema:
+ *           type: string
+ *         description: Filtrar por bairro
+ *       - in: query
+ *         name: categoria
+ *         schema:
+ *           type: integer
+ *         description: ID da categoria para filtrar
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: integer
+ *         description: ID do status para filtrar
+ *       - in: query
+ *         name: data_criacao
+ *         schema:
+ *           type: string
+ *           format: date
+ *         description: Filtrar por data de criação (YYYY-MM-DD)
+ *       - in: query
+ *         name: prioridade
+ *         schema:
+ *           type: integer
+ *         description: ID da prioridade para filtrar
  *     responses:
  *       200:
  *         description: Lista de todos os problemas
