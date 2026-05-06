@@ -13,5 +13,5 @@ module.exports = {
     migrations: {
       directory: path.resolve(__dirname, 'src', 'database', 'migrations')
     }
-  },
+  }
 };
