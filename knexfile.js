@@ -7,7 +7,7 @@ module.exports = {
     connection: {
       connectionString: process.env.POSTGRESQL_URL,
       // Disable SSL for local development
-      ssl: false,
+      ssl: true,
     },
     pool: {
       // afterCreate property removed
