@@ -7,7 +7,8 @@
     "start": "node src/server.js --host",
     "dev": "nodemon ./src/server.js",
     "migrate": "knex migrate:latest",
-    "build": "echo 'No build steps needed for this project'"
+    "build": "echo 'No build steps needed for this project'",
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
@@ -31,5 +32,8 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "zod": "^4.1.7"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2"
   }
 }
