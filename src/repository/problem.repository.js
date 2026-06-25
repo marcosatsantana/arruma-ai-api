@@ -44,8 +44,7 @@ class ProblemRepository {
         }
 
         // Para obter o total filtrado
-        const totalQuery = query.clone().clearSelect().count('* as count').first();
-        const totalResult = await totalQuery;
+        const totalResult = await knex.count('* as count').from(query.clone().clearSelect().select('problema.problemaid').as('subquery')).first();
         const total = totalResult ? totalResult.count : 0;
 
         // Paginação
@@ -81,8 +80,7 @@ class ProblemRepository {
         }
 
         // Para obter o total filtrado
-        const totalQuery = knex(query.clone().clearSelect().as('subquery')).count('* as count').first();
-        const totalResult = await totalQuery;
+        const totalResult = await knex.count('* as count').from(query.clone().clearSelect().select('problema.problemaid').as('subquery')).first();
         const total = totalResult ? totalResult.count : 0;
 
         // Paginação
