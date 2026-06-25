@@ -87,6 +87,13 @@ class ProblemController {
         categoria: problem.categoria,
         status: problem.status,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
+        imagem: problem.imagens,
+        endereco: {
+          latitude: problem.latitude,
+          longitude: problem.longitude,
+          rua: problem.rua,
+          ponto_referencia: problem.ponto_referencia,
+        }
       }));
       return res.json({
         success: true,
@@ -105,6 +112,7 @@ class ProblemController {
   async updateStatus(req, res) {
     const usuarioid = req.user.id
     const { id, status } = req.params;
+    const { prioridadeid, observacao } = req.body || {};
     try {
       const existProblem = await ProblemRepository.findById(id)
       if (!existProblem) {
@@ -117,7 +125,7 @@ class ProblemController {
       };
       const message = statusMessages[status] || "Status atualizado.";
       await notificationRepository.create(usuarioid, status, message)
-      await ProblemRepository.update(id, status)
+      await ProblemRepository.update(id, status, prioridadeid, observacao)
 
       res.status(200).send()
 

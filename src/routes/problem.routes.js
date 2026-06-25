@@ -263,8 +263,8 @@ problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.fi
  * @swagger
  * /problem/{id}/{status}:
  *   put:
- *     summary: Atualiza o status de um problema (apenas administradores)
- *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     summary: Atualiza o status, prioridade e observação de um problema (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador. Permite atualizar o status via URL, e opcionalmente a prioridade e observação via corpo da requisição.
  *     tags: [Problems]
  *     security:
  *       - bearerAuth: []
@@ -283,6 +283,21 @@ problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.fi
  *           type: integer
  *         description: Novo status do problema
  *         example: 3
+ *     requestBody:
+ *       required: false
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               prioridadeid:
+ *                 type: integer
+ *                 description: Novo ID de prioridade
+ *                 example: 2
+ *               observacao:
+ *                 type: string
+ *                 description: Observação sobre a atualização
+ *                 example: "A equipe já está a caminho."
  *     responses:
  *       200:
  *         description: Problema atualizado com sucesso

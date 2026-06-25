@@ -54,9 +54,23 @@ class ProblemRepository {
     }
     async findAll({ offset = 0, limit = 5, filters } = {}) {
         let query = knex('problema')
-            .select('problema.*', 'status.nome as status', 'categoria.nome as categoria')
+            .select(
+                'problema.*',
+                'status.nome as status',
+                'categoria.nome as categoria',
+                knex.raw('json_agg(imagem.dados) as imagens'),
+                'localizacao.*'
+            )
             .innerJoin('status', 'problema.statusid', 'status.statusid')
-            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid');
+            .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid')
+            .leftJoin('imagem', 'imagem.problemaid', 'problema.problemaid')
+            .leftJoin('localizacao', 'localizacao.localizacaoid', 'problema.localizacaoid')
+            .groupBy(
+                'problema.problemaid',
+                'status.nome',
+                'categoria.nome',
+                'localizacao.localizacaoid'
+            );
 
         if (filters) {
             if (filters.bairro) query.where('problema.bairro', 'ilike', `%${filters.bairro}%`);
@@ -67,7 +81,7 @@ class ProblemRepository {
         }
 
         // Para obter o total filtrado
-        const totalQuery = query.clone().clearSelect().count('* as count').first();
+        const totalQuery = knex(query.clone().clearSelect().as('subquery')).count('* as count').first();
         const totalResult = await totalQuery;
         const total = totalResult ? totalResult.count : 0;
 
@@ -76,8 +90,12 @@ class ProblemRepository {
         return { data, total };
     }
 
-    async update(id, status) {
-        return await knex('problema').update({ statusid: status }).where({ problemaid: id })
+    async update(id, status, prioridadeid, observacao) {
+        const updateData = { statusid: status };
+        if (prioridadeid !== undefined) updateData.prioridadeID = prioridadeid;
+        if (observacao !== undefined) updateData.observacao = observacao;
+        
+        return await knex('problema').update(updateData).where({ problemaid: id })
     }
     async findById(id) {
         return await knex('problema').where({ problemaid: id }).first()
