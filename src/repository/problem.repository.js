@@ -39,7 +39,7 @@ class ProblemRepository {
             if (filters.bairro) query.where('problema.bairro', 'ilike', `%${filters.bairro}%`);
             if (filters.categoria) query.where('problema.categoriaid', filters.categoria);
             if (filters.status) query.where('problema.statusid', filters.status);
-            if (filters.prioridade) query.where('problema.prioridadeID', filters.prioridade);
+            if (filters.prioridade) query.where('problema.prioridadeid', filters.prioridade);
             if (filters.data_criacao) query.whereRaw('DATE(problema.data_criacao) = ?', [filters.data_criacao]);
         }
 
@@ -75,7 +75,7 @@ class ProblemRepository {
             if (filters.bairro) query.where('problema.bairro', 'ilike', `%${filters.bairro}%`);
             if (filters.categoria) query.where('problema.categoriaid', filters.categoria);
             if (filters.status) query.where('problema.statusid', filters.status);
-            if (filters.prioridade) query.where('problema.prioridadeID', filters.prioridade);
+            if (filters.prioridade) query.where('problema.prioridadeid', filters.prioridade);
             if (filters.data_criacao) query.whereRaw('DATE(problema.data_criacao) = ?', [filters.data_criacao]);
         }
 
@@ -92,7 +92,7 @@ class ProblemRepository {
         const updateData = { statusid: status };
         if (prioridadeid !== undefined) updateData.prioridadeID = prioridadeid;
         if (observacao !== undefined) updateData.observacao = observacao;
-        
+
         return await knex('problema').update(updateData).where({ problemaid: id })
     }
     async findById(id) {
