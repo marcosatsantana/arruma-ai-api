@@ -6,8 +6,8 @@ module.exports = {
     client: 'pg',
     connection: {
       connectionString: process.env.POSTGRESQL_URL,
-      family: 4, // Forces the connection to use IPv4
-      ssl: { rejectUnauthorized: false }
+      family: 4 // Forces the connection to use IPv4
+      // ssl: { rejectUnauthorized: false }
     },
     pool: {},
     migrations: {

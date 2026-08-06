@@ -26,6 +26,16 @@ const usersRoutes = Router();
  *         schema:
  *           type: integer
  *         description: Quantidade de usuários por página
+ *       - in: query
+ *         name: tipo
+ *         schema:
+ *           type: string
+ *         description: Filtrar por tipo (ex. cidadao, prestador, admin)
+ *       - in: query
+ *         name: cargo
+ *         schema:
+ *           type: string
+ *         description: Filtrar por cargo
  *     responses:
  *       200:
  *         description: Lista de usuários
@@ -94,6 +104,12 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *                 type: string
  *               cpf:
  *                 type: string
+ *               tipo:
+ *                 type: string
+ *                 description: Tipo do usuário (opcional, padrão "cidadao")
+ *               cargo:
+ *                 type: string
+ *                 description: Cargo do usuário (opcional, padrão "usuario")
  *             required:
  *               - nome
  *               - email

@@ -21,13 +21,14 @@ class UsersController {
   }
   async index(req, res) {
     try {
-      const { page = 1, limit = 10 } = req.query;
+      const { page = 1, limit = 10, tipo, cargo } = req.query;
       const pageInt = parseInt(page, 10);
       const limitInt = parseInt(limit, 10);
       const offset = (pageInt - 1) * limitInt;
+      const filters = { tipo, cargo };
 
       // Busca paginada e total já do banco
-      const { data, total } = await UsersRepository.findAll({ offset, limit: limitInt });
+      const { data, total } = await UsersRepository.findAll({ offset, limit: limitInt, filters });
       const totalPages = Math.ceil(total / limitInt);
 
       return res.json({
@@ -92,8 +93,8 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: "cidadao",
-        cargo: "usuario"
+        tipo: req.body.tipo || "cidadao",
+        cargo: req.body.cargo || "usuario"
       };
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);

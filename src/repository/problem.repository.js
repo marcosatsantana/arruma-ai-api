@@ -88,12 +88,20 @@ class ProblemRepository {
         return { data, total };
     }
 
-    async update(id, status, prioridadeid, observacao) {
-        const updateData = { statusid: status };
-        if (prioridadeid !== undefined) updateData.prioridadeID = prioridadeid;
-        if (observacao !== undefined) updateData.observacao = observacao;
+    async update(id, status, prioridadeid, observacao, extra = {}) {
+        const updateData = {};
+        if (status !== undefined) updateData.statusid = status;
+        if (prioridadeid !== undefined) updateData.prioridadeid = prioridadeid;
+        if (observacao !== undefined) updateData.observacao_admin = observacao;
+        
+        // Merge extra fields (validado, validado_por, data_validacao, data_resolucao)
+        Object.assign(updateData, extra);
 
-        return await knex('problema').update(updateData).where({ problemaid: id })
+        return await knex('problema').update(updateData).where({ problemaid: id });
+    }
+
+    async delete(id) {
+        return await knex('problema').where({ problemaid: id }).del();
     }
     async findById(id) {
         return await knex('problema').where({ problemaid: id }).first()

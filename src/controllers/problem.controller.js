@@ -50,6 +50,8 @@ class ProblemController {
         categoria: problem.categoria,
         status: problem.status,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
+        validado: problem.validado,
+        data_resolucao: problem.data_resolucao ? format(new Date(problem.data_resolucao), 'dd/MM/yyyy HH:mm') : null,
         imagem: problem.imagens,
         endereco: {
           latitude: problem.latitude,
@@ -87,6 +89,8 @@ class ProblemController {
         categoria: problem.categoria,
         status: problem.status,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
+        validado: problem.validado,
+        data_resolucao: problem.data_resolucao ? format(new Date(problem.data_resolucao), 'dd/MM/yyyy HH:mm') : null,
         imagem: problem.imagens,
         endereco: {
           latitude: problem.latitude,
@@ -131,6 +135,19 @@ class ProblemController {
 
     } catch (error) {
       res.status(error.statusCode).json({ message: error.message })
+    }
+  }
+  async delete(req, res) {
+    const { id } = req.params;
+    try {
+      const existProblem = await ProblemRepository.findById(id);
+      if (!existProblem) {
+        throw new AppError('Problema não encontrado', 404);
+      }
+      await ProblemRepository.delete(id);
+      return res.status(200).json({ success: true, message: 'Problema excluído com sucesso.' });
+    } catch (error) {
+      return res.status(error.statusCode || 500).json({ success: false, message: error.message });
     }
   }
 }

@@ -307,8 +307,28 @@ problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.fi
  *         description: Acesso restrito a administradores
  */
 problemRoutes.put('/:id/:status', ensureAuthenticated, ensureAdmin, ProblemController.updateStatus);
-
-
-
+/**
+ * @swagger
+ * /problem/{id}:
+ *   delete:
+ *     summary: Exclui um problema
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do problema
+ *     responses:
+ *       200:
+ *         description: Problema excluído com sucesso
+ *       404:
+ *         description: Problema não encontrado
+ */
+problemRoutes.delete('/:id', ensureAuthenticated, ensureAdmin, ProblemController.delete);
 
 module.exports = problemRoutes;

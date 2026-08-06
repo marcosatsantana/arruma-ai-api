@@ -12,8 +12,15 @@ class UsersRepository {
     return await knex('usuario').where({ email }).orWhere({cpf}).first();
   }
 
-  async findAll({ offset = 0, limit = 5 } = {}) {
+  async findAll({ offset = 0, limit = 5, filters = {} } = {}) {
     let query = knex('usuario').select('*');
+
+    if (filters.tipo) {
+      query.where('tipo', filters.tipo);
+    }
+    if (filters.cargo) {
+      query.where('cargo', filters.cargo);
+    }
 
     // Para obter o total filtrado
     const totalQuery = query.clone().clearSelect().count('* as count').first();
