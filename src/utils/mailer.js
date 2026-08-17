@@ -1,15 +1,18 @@
 const nodemailer = require('nodemailer');
 require('dotenv').config();
 
+// Força o Node.js a usar IPv4 ao invés de IPv6 para evitar o erro ENETUNREACH no Render
+require('dns').setDefaultResultOrder('ipv4first');
+
 const transporter = nodemailer.createTransport({
   host: 'smtp.kinghost.net',
-  port: 587,
-  secure: false, // true para 465, false para outras portas (a Kinghost usa 587)
+  port: 465,
+  secure: true, // SSL/TLS exigido pela Kinghost na porta 465
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  connectionTimeout: 10000, // Falha rápido (10s) se o Render bloquear a porta
+  connectionTimeout: 10000,
   socketTimeout: 10000,
 });
 
