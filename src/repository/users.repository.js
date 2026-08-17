@@ -47,6 +47,28 @@ class UsersRepository {
     return await knex('usuario').insert({ nome, email, senha, telefone, cpf, tipo, cargo }).returning('*');
   }
 
+  async findByResetToken(token) {
+    return await knex('usuario').where({ reset_token: token }).first();
+  }
+
+  async savePasswordResetToken(id, token, expires) {
+    return await knex('usuario')
+      .where({ usuarioid: id })
+      .update({
+        reset_token: token,
+        reset_token_expires: expires
+      });
+  }
+
+  async updatePassword(id, newPassword) {
+    return await knex('usuario')
+      .where({ usuarioid: id })
+      .update({
+        senha: newPassword,
+        reset_token: null,
+        reset_token_expires: null
+      });
+  }
 }
 
 module.exports = new UsersRepository(); 

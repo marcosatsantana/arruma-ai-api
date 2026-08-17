@@ -237,5 +237,61 @@ usersRoutes.patch("/update", ensureAuthenticated, UsersController.update);
  */
 usersRoutes.get("/me", ensureAuthenticated, UsersController.findById);
 
+/**
+ * @swagger
+ * /users/forgot-password:
+ *   post:
+ *     summary: Solicita a redefinição de senha
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *             required:
+ *               - email
+ *     responses:
+ *       200:
+ *         description: Se o e-mail existir, um código de redefinição será enviado.
+ *       400:
+ *         description: Dados inválidos
+ *       500:
+ *         description: Erro no servidor
+ */
+usersRoutes.post("/forgot-password", UsersController.forgotPassword);
+
+/**
+ * @swagger
+ * /users/reset-password:
+ *   post:
+ *     summary: Redefine a senha utilizando o token recebido por e-mail
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               token:
+ *                 type: string
+ *               nova_senha:
+ *                 type: string
+ *             required:
+ *               - token
+ *               - nova_senha
+ *     responses:
+ *       200:
+ *         description: Senha redefinida com sucesso
+ *       400:
+ *         description: Token inválido, expirado ou dados insuficientes
+ *       500:
+ *         description: Erro no servidor
+ */
+usersRoutes.post("/reset-password", UsersController.resetPassword);
 
 module.exports = usersRoutes;

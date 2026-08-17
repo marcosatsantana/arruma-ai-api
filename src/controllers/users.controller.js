@@ -4,6 +4,8 @@ const UsersRepository = require('../repository/users.repository');
 const AppError = require('../utils/AppError');
 const { createUserSchema, updateUserSchema } = require('../validators/userSchemas');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const { sendEmail } = require('../utils/mailer');
 
 class UsersController {
   async findById(req, res) {
@@ -111,6 +113,67 @@ class UsersController {
         success: false,
         message: 'Ocorreu um erro inesperado no servidor.'
       });
+    }
+  }
+
+  async forgotPassword(req, res) {
+    const { email } = req.body;
+    try {
+      if (!email) {
+        return res.status(400).json({ success: false, message: 'O email é obrigatório.' });
+      }
+
+      const user = await UsersRepository.findByEmail(email);
+      if (!user) {
+        // Retornamos 200 mesmo se não achar para evitar enumerar e-mails, por segurança.
+        return res.status(200).json({ success: true, message: 'Se o email existir, um código será enviado.' });
+      }
+
+      // Gera um código numérico de 6 dígitos
+      const resetToken = crypto.randomInt(100000, 999999).toString();
+      const expires = new Date();
+      expires.setHours(expires.getHours() + 1); // 1 hora de validade
+
+      await UsersRepository.savePasswordResetToken(user.usuarioid, resetToken, expires);
+
+      const emailText = `Seu código para redefinição de senha é: ${resetToken}\nEste código expira em 1 hora.`;
+      const emailHtml = `<p>Seu código para redefinição de senha é: <strong>${resetToken}</strong></p><p>Este código expira em 1 hora.</p>`;
+
+      await sendEmail(user.email, 'Redefinição de Senha', emailText, emailHtml);
+
+      return res.status(200).json({ success: true, message: 'Se o email existir, um código será enviado.' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Ocorreu um erro ao solicitar a redefinição de senha.' });
+    }
+  }
+
+  async resetPassword(req, res) {
+    const { token, nova_senha } = req.body;
+    try {
+      if (!token || !nova_senha) {
+        return res.status(400).json({ success: false, message: 'Token e nova senha são obrigatórios.' });
+      }
+
+      const user = await UsersRepository.findByResetToken(token);
+      if (!user) {
+        return res.status(400).json({ success: false, message: 'Token inválido ou expirado.' });
+      }
+
+      const now = new Date();
+      if (now > new Date(user.reset_token_expires)) {
+        return res.status(400).json({ success: false, message: 'Token inválido ou expirado.' });
+      }
+
+      const saltRounds = 6;
+      const hashedPassword = await bcrypt.hash(nova_senha, saltRounds);
+
+      await UsersRepository.updatePassword(user.usuarioid, hashedPassword);
+
+      return res.status(200).json({ success: true, message: 'Senha redefinida com sucesso.' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Ocorreu um erro ao redefinir a senha.' });
     }
   }
 
