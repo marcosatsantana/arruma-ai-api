@@ -14,6 +14,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@getbrevo/brevo": "^6.0.3",
+    "@sendgrid/mail": "^8.1.6",
     "assemblyai": "^4.3.3",
     "axios": "^1.8.4",
     "bcryptjs": "^2.4.3",
@@ -30,6 +32,7 @@
     "nodemon": "^3.1.0",
     "pg": "^8.11.5",
     "pm2": "^5.3.1",
+    "resend": "^6.20.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "zod": "^4.1.7"

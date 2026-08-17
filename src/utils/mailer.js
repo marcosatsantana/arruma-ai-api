@@ -1,34 +1,35 @@
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 require('dotenv').config();
-
-// Força o Node.js a usar IPv4 ao invés de IPv6 para evitar o erro ENETUNREACH no Render
-require('dns').setDefaultResultOrder('ipv4first');
-
-const transporter = nodemailer.createTransport({
-  host: 'smtp.kinghost.net',
-  port: 465,
-  secure: true, // SSL/TLS exigido pela Kinghost na porta 465
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  connectionTimeout: 10000,
-  socketTimeout: 10000,
-});
 
 const sendEmail = async (to, subject, text, html) => {
   try {
-    const info = await transporter.sendMail({
-      from: `"Arruma AI" <${process.env.EMAIL_USER}>`,
-      to,
-      subject,
-      text,
-      html
+    // O EMAIL_FROM precisa ser EXATAMENTE o email que você validar no Brevo (ex: marcosxk12@gmail.com)
+    const fromEmail = process.env.EMAIL_FROM;
+
+    if (!fromEmail) {
+      throw new Error("Variável EMAIL_FROM não configurada no .env/Render. Configure com o e-mail que você verificou no Brevo.");
+    }
+
+    const payload = {
+      sender: { name: "Arruma AI", email: fromEmail },
+      to: [{ email: to }],
+      subject: subject,
+      htmlContent: html,
+      textContent: text,
+    };
+
+    const response = await axios.post('https://api.brevo.com/v3/smtp/email', payload, {
+      headers: {
+        'accept': 'application/json',
+        'api-key': process.env.BREVO_API_KEY,
+        'content-type': 'application/json'
+      }
     });
-    console.log('Email enviado: %s', info.messageId);
-    return info;
+
+    console.log('Email enviado via Brevo com sucesso:', response.data);
+    return response.data;
   } catch (error) {
-    console.error('Erro ao enviar email:', error);
+    console.error('Erro inesperado ao enviar email via Brevo:', error.response?.data || error.message);
     throw error;
   }
 };
