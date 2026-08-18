@@ -1,6 +1,7 @@
 const OrdemServicoRepository = require('../repository/ordem_servico.repository');
 const ProblemRepository = require('../repository/problem.repository');
 const AppError = require('../utils/AppError');
+const notificationRepository = require('../repository/notification.repository');
 
 class OrdemServicoController {
     async create(req, res) {
@@ -42,6 +43,8 @@ class OrdemServicoController {
                 data_validacao: new Date()
             });
 
+            await notificationRepository.create(problem.usuarioid, problem.statusid, "Sua ocorrência foi validada e atribuída a uma ordem de serviço.");
+
             return res.status(201).json({ success: true, idordem });
         } catch (error) {
             return res.status(error.statusCode || 500).json({ success: false, message: error.message });
@@ -60,7 +63,13 @@ class OrdemServicoController {
 
             // Update status
             const updateData = {};
-            if (status_inicial) updateData.status_inicial = status_inicial;
+            if (status_inicial) {
+                updateData.status_inicial = status_inicial;
+                const problem = await ProblemRepository.findById(os.problemaid);
+                if (problem) {
+                    await notificationRepository.create(problem.usuarioid, problem.statusid, `Sua ordem de serviço teve o status atualizado para: ${status_inicial}`);
+                }
+            }
             
             await OrdemServicoRepository.update(idordem, updateData);
 
@@ -71,9 +80,10 @@ class OrdemServicoController {
             if (concluido) {
                 const problem = await ProblemRepository.findById(os.problemaid);
                 if (problem) {
-                    await ProblemRepository.update(os.problemaid, problem.statusid, problem.prioridadeid, problem.observacao_admin, {
+                    await ProblemRepository.update(os.problemaid, 3, problem.prioridadeid, problem.observacao_admin, {
                         data_resolucao: new Date()
                     });
+                    await notificationRepository.create(problem.usuarioid, 3, "Sua ocorrência foi concluída com sucesso!");
                 }
             }
 

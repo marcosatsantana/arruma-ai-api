@@ -114,7 +114,6 @@ class ProblemController {
     }
   }
   async updateStatus(req, res) {
-    const usuarioid = req.user.id
     const { id, status } = req.params;
     const { prioridadeid, observacao } = req.body || {};
     try {
@@ -128,13 +127,13 @@ class ProblemController {
         3: "Problema resolvido com sucesso!"
       };
       const message = statusMessages[status] || "Status atualizado.";
-      await notificationRepository.create(usuarioid, status, message)
+      await notificationRepository.create(existProblem.usuarioid, status, message)
       await ProblemRepository.update(id, status, prioridadeid, observacao)
 
       res.status(200).send()
 
     } catch (error) {
-      res.status(error.statusCode).json({ message: error.message })
+      res.status(error.statusCode || 500).json({ message: error.message })
     }
   }
   async delete(req, res) {
