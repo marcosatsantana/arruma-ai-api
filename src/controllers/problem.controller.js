@@ -49,6 +49,8 @@ class ProblemController {
         descricao: problem.descricao,
         categoria: problem.categoria,
         status: problem.status,
+        prioridadeid: problem.prioridadeid,
+        prioridade_label: problem.prioridade_label,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
         validado: problem.validado,
         data_resolucao: problem.data_resolucao ? format(new Date(problem.data_resolucao), 'dd/MM/yyyy HH:mm') : null,
@@ -88,6 +90,8 @@ class ProblemController {
         descricao: problem.descricao,
         categoria: problem.categoria,
         status: problem.status,
+        prioridadeid: problem.prioridadeid,
+        prioridade_label: problem.prioridade_label,
         data: problem.data_criacao ? format(new Date(problem.data_criacao), 'dd/MM/yyyy HH:mm') : null,
         validado: problem.validado,
         data_resolucao: problem.data_resolucao ? format(new Date(problem.data_resolucao), 'dd/MM/yyyy HH:mm') : null,
@@ -114,8 +118,8 @@ class ProblemController {
     }
   }
   async updateStatus(req, res) {
-    const { id, status } = req.params;
-    const { prioridadeid, observacao } = req.body || {};
+    const { id } = req.params;
+    const { statusid, observacao } = req.body || {};
     try {
       const existProblem = await ProblemRepository.findById(id)
       if (!existProblem) {
@@ -126,9 +130,43 @@ class ProblemController {
         2: "Problema em andamento, equipe atuando.",
         3: "Problema resolvido com sucesso!"
       };
-      const message = statusMessages[status] || "Status atualizado.";
-      await notificationRepository.create(existProblem.usuarioid, status, message)
-      await ProblemRepository.update(id, status, prioridadeid, observacao)
+      const message = statusMessages[statusid] || "Status atualizado.";
+      await notificationRepository.create(existProblem.usuarioid, statusid, message)
+      await ProblemRepository.update(id, statusid, undefined, observacao)
+
+      res.status(200).send()
+
+    } catch (error) {
+      res.status(error.statusCode || 500).json({ message: error.message })
+    }
+  }
+  
+  async updatePriority(req, res) {
+    const { id } = req.params;
+    const { prioridadeid, observacao } = req.body || {};
+    try {
+      const existProblem = await ProblemRepository.findById(id)
+      if (!existProblem) {
+        throw new AppError('Problema não encontrado', 404)
+      }
+      await ProblemRepository.update(id, undefined, prioridadeid, observacao)
+
+      res.status(200).send()
+
+    } catch (error) {
+      res.status(error.statusCode || 500).json({ message: error.message })
+    }
+  }
+
+  async updateCategory(req, res) {
+    const { id } = req.params;
+    const { categoriaid, observacao } = req.body || {};
+    try {
+      const existProblem = await ProblemRepository.findById(id)
+      if (!existProblem) {
+        throw new AppError('Problema não encontrado', 404)
+      }
+      await ProblemRepository.update(id, undefined, undefined, observacao, { categoriaid })
 
       res.status(200).send()
 

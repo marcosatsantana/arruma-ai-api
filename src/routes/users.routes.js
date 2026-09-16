@@ -3,6 +3,7 @@ const {Router} = require('express')
 
 const UsersController = require('../controllers/users.controller');
 const ensureAuthenticated = require('../middlewares/ensure.authenticated');
+const ensureAdmin = require('../middlewares/ensure.admin');
 
 
 const usersRoutes = Router();
@@ -142,6 +143,55 @@ usersRoutes.get("/", ensureAuthenticated, UsersController.index);
  *         description: Dados inválidos
  */
 usersRoutes.post("/", UsersController.create);
+
+/**
+ * @swagger
+ * /users/admin:
+ *   post:
+ *     summary: Cria um novo usuário administrador
+ *     description: Rota restrita a administradores.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nome:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               senha:
+ *                 type: string
+ *               telefone:
+ *                 type: string
+ *               cpf:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *                 description: Tipo do usuário (opcional, padrão "admin")
+ *               cargo:
+ *                 type: string
+ *                 description: Cargo do usuário (opcional, padrão "admin")
+ *             required:
+ *               - nome
+ *               - email
+ *               - senha
+ *               - telefone
+ *               - cpf
+ *     responses:
+ *       201:
+ *         description: Usuário administrador criado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       403:
+ *         description: Acesso restrito a administradores
+ */
+usersRoutes.post("/admin", ensureAuthenticated, ensureAdmin, UsersController.createAdmin);
+
 /**
  * @swagger
  * /users/update:
@@ -293,5 +343,46 @@ usersRoutes.post("/forgot-password", UsersController.forgotPassword);
  *         description: Erro no servidor
  */
 usersRoutes.post("/reset-password", UsersController.resetPassword);
+
+/**
+ * @swagger
+ * /users/{id}/status:
+ *   put:
+ *     summary: Ativa ou desativa um usuário (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do usuário
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ativo:
+ *                 type: boolean
+ *                 description: Status do usuário
+ *                 example: false
+ *             required:
+ *               - ativo
+ *     responses:
+ *       200:
+ *         description: Status atualizado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       403:
+ *         description: Acesso restrito a administradores
+ *       404:
+ *         description: Usuário não encontrado
+ */
+usersRoutes.put('/:id/status', ensureAuthenticated, ensureAdmin, UsersController.toggleActive);
 
 module.exports = usersRoutes;

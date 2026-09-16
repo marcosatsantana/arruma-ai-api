@@ -21,18 +21,21 @@ class ProblemRepository {
                 'status.nome as status',
                 'categoria.nome as categoria',
                 knex.raw('json_agg(imagem.dados) as imagens'),
-                'localizacao.*'
+                'localizacao.*',
+                'prioridade.nome as prioridade_label'
             )
             .innerJoin('status', 'problema.statusid', 'status.statusid')
             .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid')
             .innerJoin('imagem', 'imagem.problemaid', 'problema.problemaid')
             .innerJoin('localizacao', 'localizacao.localizacaoid', 'problema.localizacaoid')
+            .leftJoin('prioridade', 'prioridade.prioridadeid', 'problema.prioridadeid')
             .where('problema.usuarioid', id)
             .groupBy(
                 'problema.problemaid',
                 'status.nome',
                 'categoria.nome',
-                'localizacao.localizacaoid'
+                'localizacao.localizacaoid',
+                'prioridade.nome'
             );
 
         if (filters) {
@@ -58,17 +61,20 @@ class ProblemRepository {
                 'status.nome as status',
                 'categoria.nome as categoria',
                 knex.raw('json_agg(imagem.dados) as imagens'),
-                'localizacao.*'
+                'localizacao.*',
+                'prioridade.nome as prioridade_label'
             )
             .innerJoin('status', 'problema.statusid', 'status.statusid')
             .innerJoin('categoria', 'problema.categoriaid', 'categoria.categoriaid')
             .leftJoin('imagem', 'imagem.problemaid', 'problema.problemaid')
             .leftJoin('localizacao', 'localizacao.localizacaoid', 'problema.localizacaoid')
+            .leftJoin('prioridade', 'prioridade.prioridadeid', 'problema.prioridadeid')
             .groupBy(
                 'problema.problemaid',
                 'status.nome',
                 'categoria.nome',
-                'localizacao.localizacaoid'
+                'localizacao.localizacaoid',
+                'prioridade.nome'
             );
 
         if (filters) {

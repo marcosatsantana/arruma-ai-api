@@ -14,6 +14,10 @@ class SessionsController {
             throw new AppError("Email e/ou senha incorreta", 401);
         }
 
+        if (user.ativo === false) {
+            throw new AppError("Usuário desativado. Entre em contato com o suporte.", 403);
+        }
+
         try {
             const passwordMatched = await compare(senha, user.senha);
 
@@ -48,6 +52,10 @@ class SessionsController {
 
         if (!user) {
             throw new AppError("Email e/ou senha incorreta", 401);
+        }
+
+        if (user.ativo === false) {
+            throw new AppError("Usuário desativado. Entre em contato com o suporte.", 403);
         }
 
         try {

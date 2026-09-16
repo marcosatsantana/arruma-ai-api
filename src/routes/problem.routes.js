@@ -128,6 +128,10 @@ problemRoutes.post("/", ensureAuthenticated, ProblemController.create);
  *                         type: string
  *                       status:
  *                         type: string
+ *                       prioridadeid:
+ *                         type: integer
+ *                       prioridade_label:
+ *                         type: string
  *                       data:
  *                         type: string
  *                       imagem:
@@ -227,6 +231,10 @@ problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
  *                         type: string
  *                       status:
  *                         type: string
+ *                       prioridadeid:
+ *                         type: integer
+ *                       prioridade_label:
+ *                         type: string
  *                       data:
  *                         type: string
  *                       imagem:
@@ -261,10 +269,10 @@ problemRoutes.get("/", ensureAuthenticated, ProblemController.findByUserId);
 problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.findAll);
 /**
  * @swagger
- * /problem/{id}/{status}:
+ * /problem/{id}/status:
  *   put:
- *     summary: Atualiza o status, prioridade e observação de um problema (apenas administradores)
- *     description: Requer autenticação via Bearer Token e permissão de administrador. Permite atualizar o status via URL, e opcionalmente a prioridade e observação via corpo da requisição.
+ *     summary: Atualiza o status e observação de um problema (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
  *     tags: [Problems]
  *     security:
  *       - bearerAuth: []
@@ -275,16 +283,48 @@ problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.fi
  *         schema:
  *           type: integer
  *         description: ID do problema
- *         example: 16
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               statusid:
+ *                 type: integer
+ *                 description: Novo status do problema
+ *                 example: 3
+ *               observacao:
+ *                 type: string
+ *                 description: Observação sobre a atualização
+ *     responses:
+ *       200:
+ *         description: Status atualizado com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       403:
+ *         description: Acesso restrito a administradores
+ */
+problemRoutes.put('/:id/status', ensureAuthenticated, ensureAdmin, ProblemController.updateStatus);
+
+/**
+ * @swagger
+ * /problem/{id}/prioridade:
+ *   put:
+ *     summary: Atualiza a prioridade e observação de um problema (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
  *       - in: path
- *         name: status
+ *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: Novo status do problema
- *         example: 3
+ *         description: ID do problema
  *     requestBody:
- *       required: false
+ *       required: true
  *       content:
  *         application/json:
  *           schema:
@@ -297,16 +337,56 @@ problemRoutes.get("/all", ensureAuthenticated, ensureAdmin, ProblemController.fi
  *               observacao:
  *                 type: string
  *                 description: Observação sobre a atualização
- *                 example: "A equipe já está a caminho."
  *     responses:
  *       200:
- *         description: Problema atualizado com sucesso
+ *         description: Prioridade atualizada com sucesso
  *       400:
  *         description: Dados inválidos
  *       403:
  *         description: Acesso restrito a administradores
  */
-problemRoutes.put('/:id/:status', ensureAuthenticated, ensureAdmin, ProblemController.updateStatus);
+problemRoutes.put('/:id/prioridade', ensureAuthenticated, ensureAdmin, ProblemController.updatePriority);
+
+/**
+ * @swagger
+ * /problem/{id}/categoria:
+ *   put:
+ *     summary: Atualiza a categoria e observação de um problema (apenas administradores)
+ *     description: Requer autenticação via Bearer Token e permissão de administrador.
+ *     tags: [Problems]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do problema
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categoriaid:
+ *                 type: integer
+ *                 description: Novo ID da categoria
+ *                 example: 4
+ *               observacao:
+ *                 type: string
+ *                 description: Observação sobre a atualização
+ *     responses:
+ *       200:
+ *         description: Categoria atualizada com sucesso
+ *       400:
+ *         description: Dados inválidos
+ *       403:
+ *         description: Acesso restrito a administradores
+ */
+problemRoutes.put('/:id/categoria', ensureAuthenticated, ensureAdmin, ProblemController.updateCategory);
+
 /**
  * @swagger
  * /problem/{id}:

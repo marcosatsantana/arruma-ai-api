@@ -95,8 +95,44 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: req.body.tipo || "cidadao",
-        cargo: req.body.cargo || "usuario"
+        tipo: "cidadao",
+        cargo: "usuario"
+      };
+      const created = await UsersRepository.create(userData);
+      return res.status(201).json(created);
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: error.issues[0].message
+        });
+      }
+
+      console.error(error);
+      return res.status(500).json({
+        success: false,
+        message: 'Ocorreu um erro inesperado no servidor.'
+      });
+    }
+  }
+
+  async createAdmin(req, res) {
+    try {
+      const validatedData = createUserSchema.parse(req.body);
+      const existingUser = await UsersRepository.findByEmailOrCpf(validatedData.email, validatedData.cpf);
+      if (existingUser) {
+        return res.status(400).json({ success: false, message: 'Email ou CPF já cadastrado.' });
+      }
+      const saltRounds = 6;
+      const hashedPassword = await bcrypt.hash(validatedData.senha, saltRounds);
+      const userData = {
+        nome: validatedData.nome,
+        email: validatedData.email,
+        senha: hashedPassword,
+        telefone: validatedData.telefone,
+        cpf: validatedData.cpf,
+        tipo: req.body.tipo || "admin",
+        cargo: req.body.cargo || "admin"
       };
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);
@@ -174,6 +210,27 @@ class UsersController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ success: false, message: 'Ocorreu um erro ao redefinir a senha.' });
+    }
+  }
+
+  async toggleActive(req, res) {
+    const { id } = req.params;
+    const { ativo } = req.body;
+    try {
+      if (ativo === undefined) {
+        return res.status(400).json({ success: false, message: 'O status ativo é obrigatório.' });
+      }
+      const user = await UsersRepository.findById(id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+      }
+      
+      await UsersRepository.update(id, { ativo });
+      
+      return res.status(200).json({ success: true, message: 'Status do usuário atualizado com sucesso.' });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Ocorreu um erro ao atualizar o status do usuário.' });
     }
   }
 
