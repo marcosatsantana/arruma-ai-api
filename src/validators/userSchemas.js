@@ -8,7 +8,9 @@ const createUserSchema = z.object({
   cpf: z.string()
     .min(11, "CPF deve ter 11 dígitos")
     .max(11, "CPF deve ter 11 dígitos")
-    .refine(val => val !== "00000000000", { message: "CPF inválido" })
+    .refine(val => val !== "00000000000", { message: "CPF inválido" }),
+  tipo: z.string().optional(),
+  cargo: z.string().optional()
 });
 
 const updateUserSchema = z.object({

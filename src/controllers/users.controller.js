@@ -131,8 +131,8 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: req.body.tipo || "admin",
-        cargo: req.body.cargo || "admin"
+        tipo: validatedData.tipo || "admin",
+        cargo: validatedData.cargo || "admin"
       };
       const created = await UsersRepository.create(userData);
       return res.status(201).json(created);
