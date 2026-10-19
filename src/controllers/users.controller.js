@@ -2,7 +2,8 @@ const { ZodError } = require('zod');
 const usersRepository = require('../repository/users.repository');
 const UsersRepository = require('../repository/users.repository');
 const AppError = require('../utils/AppError');
-const { createUserSchema, updateUserSchema } = require('../validators/userSchemas');
+const CategoryRepository = require('../repository/category.repository');
+const { createUserSchema, updateUserSchema, updateCategoriasSchema } = require('../validators/userSchemas');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const { sendEmail } = require('../utils/mailer');
@@ -16,6 +17,7 @@ class UsersController {
         throw new AppError(404, 'Usuario não encontrado')
       }
       const { senha: _, ...userWithoutPassword } = user;
+      userWithoutPassword.categorias = await usersRepository.findCategorias(id);
       return res.status(200).json({ success: true, user: userWithoutPassword })
     } catch (error) {
       return res.status(400).json({ success: false, message: error.errors || error.message });
@@ -23,11 +25,11 @@ class UsersController {
   }
   async index(req, res) {
     try {
-      const { page = 1, limit = 10, tipo, cargo } = req.query;
+      const { page = 1, limit = 10, tipo, cargo, categoriaid } = req.query;
       const pageInt = parseInt(page, 10);
       const limitInt = parseInt(limit, 10);
       const offset = (pageInt - 1) * limitInt;
-      const filters = { tipo, cargo };
+      const filters = { tipo, cargo, categoriaid };
 
       // Busca paginada e total já do banco
       const { data, total } = await UsersRepository.findAll({ offset, limit: limitInt, filters });
@@ -123,6 +125,17 @@ class UsersController {
       if (existingUser) {
         return res.status(400).json({ success: false, message: 'Email ou CPF já cadastrado.' });
       }
+      const tipo = validatedData.tipo || "admin";
+      const categorias = [...new Set(validatedData.categorias || [])];
+      if (categorias.length) {
+        if (tipo !== 'prestador') {
+          return res.status(400).json({ success: false, message: 'Somente prestadores podem ter categorias de atuação.' });
+        }
+        const found = await CategoryRepository.findByIds(categorias);
+        if (found.length !== categorias.length) {
+          return res.status(400).json({ success: false, message: 'Uma ou mais categorias não existem.' });
+        }
+      }
       const saltRounds = 6;
       const hashedPassword = await bcrypt.hash(validatedData.senha, saltRounds);
       const userData = {
@@ -131,10 +144,13 @@ class UsersController {
         senha: hashedPassword,
         telefone: validatedData.telefone,
         cpf: validatedData.cpf,
-        tipo: validatedData.tipo || "admin",
+        tipo,
         cargo: validatedData.cargo || "admin"
       };
       const created = await UsersRepository.create(userData);
+      if (categorias.length) {
+        created[0].categorias = await UsersRepository.setCategorias(created[0].usuarioid, categorias);
+      }
       return res.status(201).json(created);
     } catch (error) {
       if (error instanceof ZodError) {
@@ -210,6 +226,42 @@ class UsersController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ success: false, message: 'Ocorreu um erro ao redefinir a senha.' });
+    }
+  }
+
+  async updateCategorias(req, res) {
+    const { id } = req.params;
+    try {
+      const { categorias } = updateCategoriasSchema.parse(req.body);
+      const categoriaids = [...new Set(categorias)];
+
+      const user = await UsersRepository.findById(id);
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuário não encontrado.' });
+      }
+      if (user.tipo !== 'prestador') {
+        return res.status(400).json({ success: false, message: 'Somente prestadores podem ter categorias de atuação.' });
+      }
+
+      if (categoriaids.length) {
+        const found = await CategoryRepository.findByIds(categoriaids);
+        if (found.length !== categoriaids.length) {
+          return res.status(400).json({ success: false, message: 'Uma ou mais categorias não existem.' });
+        }
+      }
+
+      const updated = await UsersRepository.setCategorias(user.usuarioid, categoriaids);
+      return res.status(200).json({ success: true, usuarioid: user.usuarioid, categorias: updated });
+    } catch (error) {
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          success: false,
+          message: error.issues[0].message
+        });
+      }
+
+      console.error(error);
+      return res.status(500).json({ success: false, message: 'Ocorreu um erro ao atualizar as categorias do prestador.' });
     }
   }
 

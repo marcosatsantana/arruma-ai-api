@@ -7,6 +7,7 @@ class OrdemServicoRepository {
             titulo_os,
             usuarioid,
             problemaid,
+            categoriaid,
             previsao_inicio,
             prazo_estimado,
             status_inicial,
@@ -18,6 +19,7 @@ class OrdemServicoRepository {
             titulo_os,
             usuarioid,
             problemaid,
+            categoriaid,
             previsao_inicio,
             prazo_estimado,
             status_inicial,
@@ -45,10 +47,12 @@ class OrdemServicoRepository {
             .select(
                 'ordemservico.*',
                 'usuario.nome as prestador_nome',
-                'problema.descricao as problema_descricao'
+                'problema.descricao as problema_descricao',
+                'categoria.nome as categoria_nome'
             )
             .innerJoin('usuario', 'ordemservico.usuarioid', 'usuario.usuarioid')
             .innerJoin('problema', 'ordemservico.problemaid', 'problema.problemaid')
+            .innerJoin('categoria', 'ordemservico.categoriaid', 'categoria.categoriaid')
             .orderBy('ordemservico.data_criacao', 'desc');
     }
 
@@ -56,9 +60,11 @@ class OrdemServicoRepository {
         return await knex('ordemservico')
             .select(
                 'ordemservico.*',
-                'problema.descricao as problema_descricao'
+                'problema.descricao as problema_descricao',
+                'categoria.nome as categoria_nome'
             )
             .innerJoin('problema', 'ordemservico.problemaid', 'problema.problemaid')
+            .innerJoin('categoria', 'ordemservico.categoriaid', 'categoria.categoriaid')
             .where('ordemservico.usuarioid', usuarioid)
             .orderBy('ordemservico.data_criacao', 'desc');
     }

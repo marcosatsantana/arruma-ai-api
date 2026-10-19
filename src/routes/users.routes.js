@@ -37,6 +37,11 @@ const usersRoutes = Router();
  *         schema:
  *           type: string
  *         description: Filtrar por cargo
+ *       - in: query
+ *         name: categoriaid
+ *         schema:
+ *           type: integer
+ *         description: Filtrar prestadores que atendem esta categoria (tipo de ocorrência). Ex. tipo=prestador&categoriaid=2
  *     responses:
  *       200:
  *         description: Lista de usuários
@@ -69,6 +74,11 @@ const usersRoutes = Router();
  *                       senha:
  *                         type: string
  *                         nullable: true
+ *                       categorias:
+ *                         type: array
+ *                         description: Classificação de atuação (somente prestadores)
+ *                         items:
+ *                           $ref: '#/components/schemas/Categoria'
  *                 pagination:
  *                   type: object
  *                   properties:
@@ -148,8 +158,10 @@ usersRoutes.post("/", UsersController.create);
  * @swagger
  * /users/admin:
  *   post:
- *     summary: Cria um novo usuário administrador
- *     description: Rota restrita a administradores.
+ *     summary: Cria um novo usuário administrador ou prestador
+ *     description: |
+ *       Rota restrita a administradores. Para cadastrar um prestador de serviço envie `tipo: "prestador"`
+ *       e, opcionalmente, `categorias` com os tipos de ocorrência em que ele atua (ex. Iluminação, Buraco na via).
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
@@ -176,6 +188,12 @@ usersRoutes.post("/", UsersController.create);
  *               cargo:
  *                 type: string
  *                 description: Cargo do usuário (opcional, padrão "admin")
+ *               categorias:
+ *                 type: array
+ *                 description: IDs das categorias (tipos de ocorrência) que o prestador atende. Só permitido quando tipo = "prestador".
+ *                 items:
+ *                   type: integer
+ *                 example: [1, 2]
  *             required:
  *               - nome
  *               - email
@@ -184,9 +202,9 @@ usersRoutes.post("/", UsersController.create);
  *               - cpf
  *     responses:
  *       201:
- *         description: Usuário administrador criado com sucesso
+ *         description: Usuário criado com sucesso
  *       400:
- *         description: Dados inválidos
+ *         description: Dados inválidos, categoria inexistente ou categorias enviadas para usuário que não é prestador
  *       403:
  *         description: Acesso restrito a administradores
  */
@@ -284,6 +302,11 @@ usersRoutes.patch("/update", ensureAuthenticated, UsersController.update);
  *                       type: string
  *                     cargo:
  *                       type: string
+ *                     categorias:
+ *                       type: array
+ *                       description: Classificação de atuação (somente prestadores)
+ *                       items:
+ *                         $ref: '#/components/schemas/Categoria'
  */
 usersRoutes.get("/me", ensureAuthenticated, UsersController.findById);
 
@@ -384,5 +407,62 @@ usersRoutes.post("/reset-password", UsersController.resetPassword);
  *         description: Usuário não encontrado
  */
 usersRoutes.put('/:id/status', ensureAuthenticated, ensureAdmin, UsersController.toggleActive);
+
+/**
+ * @swagger
+ * /users/{id}/categorias:
+ *   put:
+ *     summary: Define a classificação (categorias de atuação) de um prestador (apenas administradores)
+ *     description: |
+ *       Substitui todas as categorias do prestador pelas informadas. Envie um array vazio para remover todas.
+ *       Os IDs vêm de `GET /category`. O usuário precisa ser do tipo "prestador".
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID do prestador
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               categorias:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 example: [2]
+ *             required:
+ *               - categorias
+ *     responses:
+ *       200:
+ *         description: Categorias atualizadas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 usuarioid:
+ *                   type: integer
+ *                 categorias:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Categoria'
+ *       400:
+ *         description: Dados inválidos, categoria inexistente ou usuário não é prestador
+ *       403:
+ *         description: Acesso restrito a administradores
+ *       404:
+ *         description: Usuário não encontrado
+ */
+usersRoutes.put('/:id/categorias', ensureAuthenticated, ensureAdmin, UsersController.updateCategorias);
 
 module.exports = usersRoutes;

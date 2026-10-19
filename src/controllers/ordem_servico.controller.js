@@ -1,5 +1,7 @@
 const OrdemServicoRepository = require('../repository/ordem_servico.repository');
 const ProblemRepository = require('../repository/problem.repository');
+const UsersRepository = require('../repository/users.repository');
+const CategoryRepository = require('../repository/category.repository');
 const AppError = require('../utils/AppError');
 const notificationRepository = require('../repository/notification.repository');
 
@@ -11,6 +13,7 @@ class OrdemServicoController {
             titulo_os,
             usuarioid, // prestador atribuido
             problemaid,
+            categoriaid, // tipo de ocorrência (opcional, padrão: categoria do problema)
             previsao_inicio,
             prazo_estimado,
             status_inicial,
@@ -24,12 +27,19 @@ class OrdemServicoController {
                 throw new AppError('Problema não encontrado', 404);
             }
 
+            const tipoOcorrencia = categoriaid || problem.categoriaid;
+            const categoria = await CategoryRepository.findById(tipoOcorrencia);
+            if (!categoria) {
+                throw new AppError('Tipo de ocorrência (categoria) não encontrado', 404);
+            }
+
             // Criar a ordem de serviço
             const idordem = await OrdemServicoRepository.create({
                 prioridade,
                 titulo_os,
                 usuarioid,
                 problemaid,
+                categoriaid: tipoOcorrencia,
                 previsao_inicio,
                 prazo_estimado,
                 status_inicial,
@@ -109,6 +119,32 @@ class OrdemServicoController {
             return res.json({ success: true, data: ordens });
         } catch (error) {
             return res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
+    async findPrestadoresCompativeis(req, res) {
+        const { idordem } = req.params;
+        try {
+            const os = await OrdemServicoRepository.findById(idordem);
+            if (!os) {
+                throw new AppError('Ordem de serviço não encontrada', 404);
+            }
+
+            const categoria = await CategoryRepository.findById(os.categoriaid);
+            const prestadores = await UsersRepository.findPrestadoresCompativeis(os.categoriaid);
+
+            return res.json({
+                success: true,
+                ordem_servico: {
+                    idordem: os.idordem,
+                    categoriaid: os.categoriaid,
+                    categoria_nome: categoria ? categoria.nome : null,
+                    prestador_atual: os.usuarioid
+                },
+                data: prestadores
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ success: false, message: error.message });
         }
     }
 

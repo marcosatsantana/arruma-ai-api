@@ -10,7 +10,14 @@ const createUserSchema = z.object({
     .max(11, "CPF deve ter 11 dígitos")
     .refine(val => val !== "00000000000", { message: "CPF inválido" }),
   tipo: z.string().optional(),
-  cargo: z.string().optional()
+  cargo: z.string().optional(),
+  categorias: z.array(z.number().int().positive("Categoria inválida")).optional()
+});
+
+const updateCategoriasSchema = z.object({
+  categorias: z.array(z.number().int().positive("Categoria inválida"), {
+    message: "Informe um array de IDs de categorias"
+  })
 });
 
 const updateUserSchema = z.object({
@@ -23,5 +30,6 @@ const updateUserSchema = z.object({
 
 module.exports = {
   createUserSchema,
-  updateUserSchema
+  updateUserSchema,
+  updateCategoriasSchema
 };

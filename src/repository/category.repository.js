@@ -7,6 +7,14 @@ class CategoryRepository {
 
     return categorys
   }
+
+  async findById(categoriaid) {
+    return await knex('categoria').where({ categoriaid }).first();
+  }
+
+  async findByIds(categoriaids) {
+    return await knex('categoria').whereIn('categoriaid', categoriaids);
+  }
 }
 
 module.exports = new CategoryRepository(); 
