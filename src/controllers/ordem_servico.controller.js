@@ -5,13 +5,32 @@ const CategoryRepository = require('../repository/category.repository');
 const AppError = require('../utils/AppError');
 const notificationRepository = require('../repository/notification.repository');
 
+// Garante que o usuário é um prestador ativo que atende o tipo de ocorrência da O.S.
+async function validarPrestador(usuarioid, categoriaid) {
+    const prestador = await UsersRepository.findById(usuarioid);
+    if (!prestador) {
+        throw new AppError('Prestador não encontrado', 404);
+    }
+    if (prestador.tipo !== 'prestador') {
+        throw new AppError('O usuário informado não é um prestador de serviço', 400);
+    }
+    if (!prestador.ativo) {
+        throw new AppError('O prestador informado está inativo', 400);
+    }
+    const categorias = await UsersRepository.findCategorias(usuarioid);
+    if (!categorias.some(c => c.categoriaid === categoriaid)) {
+        throw new AppError('O prestador não atende o tipo de ocorrência desta O.S.', 400);
+    }
+    return prestador;
+}
+
 class OrdemServicoController {
     async create(req, res) {
         const { id } = req.user; // prestador de serviço ou admin que cria (geralmente admin, ou prestador)
         const {
             prioridade,
             titulo_os,
-            usuarioid, // prestador atribuido
+            usuarioid, // prestador atribuído (opcional, pode ser vinculado depois)
             problemaid,
             categoriaid, // tipo de ocorrência (opcional, padrão: categoria do problema)
             previsao_inicio,
@@ -33,16 +52,20 @@ class OrdemServicoController {
                 throw new AppError('Tipo de ocorrência (categoria) não encontrado', 404);
             }
 
+            if (usuarioid) {
+                await validarPrestador(usuarioid, tipoOcorrencia);
+            }
+
             // Criar a ordem de serviço
             const idordem = await OrdemServicoRepository.create({
                 prioridade,
                 titulo_os,
-                usuarioid,
+                usuarioid: usuarioid || null,
                 problemaid,
                 categoriaid: tipoOcorrencia,
                 previsao_inicio,
                 prazo_estimado,
-                status_inicial,
+                status_inicial: status_inicial || (usuarioid ? 'Atribuída' : 'Pendente'),
                 descricao_servico
             });
 
@@ -119,6 +142,45 @@ class OrdemServicoController {
             return res.json({ success: true, data: ordens });
         } catch (error) {
             return res.status(500).json({ success: false, message: error.message });
+        }
+    }
+
+    async vincularPrestador(req, res) {
+        const { idordem } = req.params;
+        const { usuarioid } = req.body;
+
+        try {
+            if (!Number.isInteger(usuarioid) || usuarioid <= 0) {
+                throw new AppError('Informe o usuarioid do prestador', 400);
+            }
+
+            const os = await OrdemServicoRepository.findById(idordem);
+            if (!os) {
+                throw new AppError('Ordem de serviço não encontrada', 404);
+            }
+            if (os.status_inicial === 'Concluída') {
+                throw new AppError('Não é possível alterar o prestador de uma O.S. concluída', 400);
+            }
+
+            const prestador = await validarPrestador(usuarioid, os.categoriaid);
+
+            const updateData = { usuarioid };
+            if (!os.status_inicial || os.status_inicial === 'Pendente') {
+                updateData.status_inicial = 'Atribuída';
+            }
+            await OrdemServicoRepository.update(idordem, updateData);
+
+            await notificationRepository.create(prestador.usuarioid, 5, `Você foi vinculado à ordem de serviço #${os.idordem}: ${os.titulo_os}`);
+
+            const atualizada = await OrdemServicoRepository.findById(idordem);
+            return res.json({
+                success: true,
+                message: 'Prestador vinculado à ordem de serviço com sucesso.',
+                prestador_anterior: os.usuarioid,
+                data: atualizada
+            });
+        } catch (error) {
+            return res.status(error.statusCode || 500).json({ success: false, message: error.message });
         }
     }
 

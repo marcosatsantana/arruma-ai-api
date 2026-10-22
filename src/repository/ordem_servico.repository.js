@@ -50,7 +50,7 @@ class OrdemServicoRepository {
                 'problema.descricao as problema_descricao',
                 'categoria.nome as categoria_nome'
             )
-            .innerJoin('usuario', 'ordemservico.usuarioid', 'usuario.usuarioid')
+            .leftJoin('usuario', 'ordemservico.usuarioid', 'usuario.usuarioid')
             .innerJoin('problema', 'ordemservico.problemaid', 'problema.problemaid')
             .innerJoin('categoria', 'ordemservico.categoriaid', 'categoria.categoriaid')
             .orderBy('ordemservico.data_criacao', 'desc');

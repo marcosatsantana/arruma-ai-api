@@ -32,7 +32,7 @@ const options = {
             idordem: { type: 'integer', example: 7 },
             prioridade: { type: 'string', example: 'Alta' },
             titulo_os: { type: 'string', example: 'Troca de lâmpada do poste' },
-            usuarioid: { type: 'integer', description: 'Prestador atribuído', example: 12 },
+            usuarioid: { type: 'integer', nullable: true, description: 'Prestador atribuído (null enquanto a O.S. não tiver prestador)', example: 12 },
             problemaid: { type: 'integer', example: 30 },
             categoriaid: { type: 'integer', description: 'Tipo de ocorrência da O.S.', example: 2 },
             categoria_nome: { type: 'string', example: 'Iluminação' },

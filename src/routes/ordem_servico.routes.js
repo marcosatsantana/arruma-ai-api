@@ -12,8 +12,13 @@ const osRoutes = Router();
  *     summary: Cria uma nova ordem de serviço
  *     description: |
  *       Requer autenticação. O prestador ou admin pode criar.
- *       O tipo de ocorrência (`categoriaid`) é opcional: se não for enviado, a O.S. herda a categoria do problema.
- *       Para escolher o prestador, use antes `GET /ordemservico/{idordem}/prestadores-compativeis` ou `GET /users?tipo=prestador&categoriaid=X`.
+ *
+ *       - O tipo de ocorrência (`categoriaid`) é opcional: se não for enviado, a O.S. herda a categoria do problema.
+ *       - O prestador (`usuarioid`) é opcional: a O.S. pode ser aberta sem prestador (status "Pendente") e
+ *         vinculada depois com `PUT /ordemservico/{idordem}/prestador`. Para escolher o prestador use
+ *         `GET /ordemservico/{idordem}/prestadores-compativeis`.
+ *       - Se `usuarioid` for enviado, ele precisa ser um prestador ativo que atenda o tipo de ocorrência da O.S.;
+ *         nesse caso o status padrão é "Atribuída".
  *     tags: [Ordem de Serviço]
  *     security:
  *       - bearerAuth: []
@@ -32,7 +37,8 @@ const osRoutes = Router();
  *                 example: Troca de lâmpada do poste
  *               usuarioid:
  *                 type: integer
- *                 description: ID do prestador atribuído
+ *                 nullable: true
+ *                 description: ID do prestador (opcional). Se omitido, a O.S. fica sem prestador até o vínculo.
  *               problemaid:
  *                 type: integer
  *               categoriaid:
@@ -46,12 +52,12 @@ const osRoutes = Router();
  *                 type: string
  *               status_inicial:
  *                 type: string
+ *                 description: Opcional. Padrão "Pendente" sem prestador e "Atribuída" com prestador.
  *               descricao_servico:
  *                 type: string
  *             required:
  *               - prioridade
  *               - titulo_os
- *               - usuarioid
  *               - problemaid
  *     responses:
  *       201:
@@ -65,8 +71,10 @@ const osRoutes = Router();
  *                   type: boolean
  *                 idordem:
  *                   type: integer
+ *       400:
+ *         description: Prestador inválido (não é prestador, está inativo ou não atende o tipo de ocorrência)
  *       404:
- *         description: Problema ou tipo de ocorrência (categoria) não encontrado
+ *         description: Problema, tipo de ocorrência (categoria) ou prestador não encontrado
  */
 osRoutes.post("/", ensureAuthenticated, OrdemServicoController.create);
 
@@ -168,7 +176,8 @@ osRoutes.get("/prestador", ensureAuthenticated, OrdemServicoController.findByPre
  *                       example: Iluminação
  *                     prestador_atual:
  *                       type: integer
- *                       description: usuarioid do prestador atualmente atribuído à O.S.
+ *                       nullable: true
+ *                       description: usuarioid do prestador atualmente atribuído à O.S. (null se ainda não houver)
  *                       example: 12
  *                 data:
  *                   type: array
@@ -180,6 +189,70 @@ osRoutes.get("/prestador", ensureAuthenticated, OrdemServicoController.findByPre
  *         description: Ordem de serviço não encontrada
  */
 osRoutes.get("/:idordem/prestadores-compativeis", ensureAuthenticated, ensureAdmin, OrdemServicoController.findPrestadoresCompativeis);
+
+/**
+ * @swagger
+ * /ordemservico/{idordem}/prestador:
+ *   put:
+ *     summary: Vincula (ou troca) o prestador de uma ordem de serviço (Apenas admins)
+ *     description: |
+ *       Vincula um prestador a uma O.S. aberta sem prestador, ou substitui o prestador atual.
+ *
+ *       Regras:
+ *       - O usuário precisa ser `tipo = prestador`, estar ativo e atender o tipo de ocorrência (categoria) da O.S.
+ *         Use `GET /ordemservico/{idordem}/prestadores-compativeis` para ver os prestadores válidos.
+ *       - Não é permitido alterar o prestador de uma O.S. "Concluída".
+ *       - Se a O.S. estiver "Pendente" (ou sem status), o status passa para "Atribuída".
+ *       - O prestador recebe uma notificação do vínculo.
+ *     tags: [Ordem de Serviço]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: idordem
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: Número da O.S.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               usuarioid:
+ *                 type: integer
+ *                 description: ID do prestador a ser vinculado
+ *                 example: 55
+ *             required:
+ *               - usuarioid
+ *     responses:
+ *       200:
+ *         description: Prestador vinculado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 prestador_anterior:
+ *                   type: integer
+ *                   nullable: true
+ *                   description: usuarioid do prestador antes da alteração (null se a O.S. estava sem prestador)
+ *                 data:
+ *                   $ref: '#/components/schemas/OrdemServico'
+ *       400:
+ *         description: usuarioid ausente, usuário não é prestador, prestador inativo, prestador não atende o tipo de ocorrência ou O.S. concluída
+ *       403:
+ *         description: Acesso restrito a administradores
+ *       404:
+ *         description: Ordem de serviço ou prestador não encontrado
+ */
+osRoutes.put("/:idordem/prestador", ensureAuthenticated, ensureAdmin, OrdemServicoController.vincularPrestador);
 
 /**
  * @swagger
