@@ -61,6 +61,7 @@ class OrdemServicoController {
                 prioridade,
                 titulo_os,
                 usuarioid: usuarioid || null,
+                data_atribuicao: usuarioid ? new Date() : null,
                 problemaid,
                 categoriaid: tipoOcorrencia,
                 previsao_inicio,
@@ -164,7 +165,7 @@ class OrdemServicoController {
 
             const prestador = await validarPrestador(usuarioid, os.categoriaid);
 
-            const updateData = { usuarioid };
+            const updateData = { usuarioid, data_atribuicao: new Date() };
             if (!os.status_inicial || os.status_inicial === 'Pendente') {
                 updateData.status_inicial = 'Atribuída';
             }

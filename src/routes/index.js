@@ -7,6 +7,7 @@ const problemRoutes = require('./problem.routes');
 const categoryRoutes = require('./category.routes');
 const notificationRoutes = require('./notification.routes');
 const ordemServicoRoutes = require('./ordem_servico.routes');
+const relatoriosRoutes = require('./relatorios.routes');
 
 routes.use('/sessions', sessionsRoutes);
 routes.use('/users', usersRoutes);
@@ -14,6 +15,7 @@ routes.use('/category', categoryRoutes);
 routes.use('/problem', problemRoutes);
 routes.use('/notification', notificationRoutes);
 routes.use('/ordemservico', ordemServicoRoutes);
+routes.use('/relatorios', relatoriosRoutes);
 
 
 module.exports = routes;
